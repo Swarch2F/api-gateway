@@ -15,10 +15,7 @@ async function startServer() {
   app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
-/*************  ✨ Windsurf Command 🌟  *************/
     allowedHeaders: '*'
-    allowedHeaders: ['Content-Type', 'Authorization']
-/*******  77ec5edd-b804-48d2-ba70-833d5689b861  *******/
   }));
 
   apolloServer.applyMiddleware({ app, path: '/graphql' });
