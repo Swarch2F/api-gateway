@@ -1,7 +1,7 @@
-const {invokeBECALIF} = require('./baseService')
+const {invokeBEPROASIG} = require('./baseService')
 
 /**
- * Invoca BECALIF → { asignaturas { id nombre profesorIds } }
+ * Invoca BEPROASIG → { asignaturas { id nombre profesorIds } }
  */
 async function getAsignaturas() {
   const query = `
@@ -13,12 +13,12 @@ async function getAsignaturas() {
       }
     }
   `;
-  const data = await invokeBECALIF(query);
+  const data = await invokeBEPROASIG(query);
   return data.asignaturas; // [ { id, nombre, profesorIds }, ... ]
 }
 
 /**
- * Invoca BECALIF → { asignaturaPorId(id: $id) { id nombre profesorIds } }
+ * Invoca BEPROASIG → { asignaturaPorId(id: $id) { id nombre profesorIds } }
  * @param {string} id
  */
 async function getAsignaturaPorId(id) {
@@ -31,12 +31,12 @@ async function getAsignaturaPorId(id) {
       }
     }
   `;
-  const data = await invokeBECALIF(query, { id });
+  const data = await invokeBEPROASIG(query, { id });
   return data.asignaturaPorId; // { id, nombre, profesorIds } o null
 }
 
 /**
- * Invoca BECALIF → mutation { crearAsignatura(nombre:$nombre) { id nombre profesorIds } }
+ * Invoca BEPROASIG → mutation { crearAsignatura(nombre:$nombre) { id nombre profesorIds } }
  * @param {object} input – { nombre: string }
  */
 async function crearAsignatura({ nombre }) {
@@ -49,12 +49,12 @@ async function crearAsignatura({ nombre }) {
       }
     }
   `;
-  const data = await invokeBECALIF(mutation, { nombre });
+  const data = await invokeBEPROASIG(mutation, { nombre });
   return data.crearAsignatura; // { id, nombre, profesorIds }
 }
 
 /**
- * Invoca BECALIF → mutation { asignarProfesorAAsignatura(profesorId:$profesorId, asignaturaId:$asignaturaId) { id nombre profesorIds } }
+ * Invoca BEPROASIG → mutation { asignarProfesorAAsignatura(profesorId:$profesorId, asignaturaId:$asignaturaId) { id nombre profesorIds } }
  * @param {object} input – { profesorId: string, asignaturaId: string }
  */
 async function asignarProfesorAAsignatura({ profesorId, asignaturaId }) {
@@ -67,7 +67,7 @@ async function asignarProfesorAAsignatura({ profesorId, asignaturaId }) {
       }
     }
   `;
-  const data = await invokeBECALIF(mutation, { profesorId, asignaturaId });
+  const data = await invokeBEPROASIG(mutation, { profesorId, asignaturaId });
   return data.asignarProfesorAAsignatura; // { id, nombre, profesorIds }
 }
 

@@ -1,6 +1,6 @@
 
 const {
-  getHolaMundoFromMS1,
+  getHolaMundoFromBEPROASIG,
   getProfesores,
   getProfesorPorId,
   crearProfesor,
@@ -19,7 +19,7 @@ const {
 
 
 const {
-  getHolaMundoFromMS2,
+  getHolaMundoFromBECALIF,
   getCalificaciones,
   registrarCalificacion,
   actualizarCalificacion,
@@ -28,13 +28,13 @@ const {
 
 const resolvers = {
   Query: {
-    holaMundo1: async () => getHolaMundoFromMS1(),
+    holaMundo1: async () => getHolaMundoFromBEPROASIG(),
     profesores: async () => getProfesores(),
     profesorPorId: async (_, { id }) => getProfesorPorId(id),
     asignaturas: async () => getAsignaturas(),
     asignaturaPorId: async (_, { id }) => getAsignaturaPorId(id),
 
-    holaMundo2: async () => getHolaMundoFromMS2(),
+    holaMundo2: async () => getHolaMundoFromBECALIF(),
     calificaciones: async (_, args) => getCalificaciones(args)
   },
 

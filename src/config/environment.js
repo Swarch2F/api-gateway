@@ -1,5 +1,5 @@
 module.exports = {
-  MS1_URL: process.env.MS1_URL || 'http://localhost:8080/graphql',
-  MS2_URL: process.env.MS2_URL || 'http://localhost:8081/graphql',
+  GX_BE_PROASIG_URL: process.env.GX_BE_PROASIG_URL || 'http://localhost:8080/graphql',
+  GX_BE_CALIF_URL: process.env.GX_BE_CALIF_URL || 'http://localhost:8081/graphql',
   PORT: process.env.PORT || 4000
 };
