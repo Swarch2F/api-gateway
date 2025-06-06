@@ -1,10 +1,22 @@
 const { gql } = require('apollo-server-express');
+const professorTypes = require('./types/professorTypes');
+const subjectTypes = require('./types/subjectTypes');
+const gradesTypes = require('./types/gradesTypes');
 
-const typeDefs = gql`
+// Definición base de tipos
+const baseTypes = gql`
   type Query {
-    hello1: String!
-    hello2: String!
+    holaMundo1: String!
+    holaMundo2: String!
+  }
+
+  type Mutation {
+    _empty: String
   }
 `;
 
-module.exports = typeDefs;
+// Combinamos todos los types en un array
+const typeDefs = [baseTypes, professorTypes, subjectTypes, gradesTypes];
+
+module.exports = { typeDefs };
+

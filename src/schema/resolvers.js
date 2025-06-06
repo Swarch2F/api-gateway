@@ -1,10 +1,76 @@
-const { fetchHolaMundo } = require('../services/hello');
+/* const { fetchHolaMundo } = require('../services/hello');
 const { MS1_URL, MS2_URL } = require('../config/environment');
 
 const resolvers = {
   Query: {
     hello1: async () => await fetchHolaMundo(MS1_URL),
     hello2: async () => await fetchHolaMundo(MS2_URL)
+  }
+};
+
+module.exports = resolvers; */
+
+
+// api-gateway/resolvers.js
+const {
+  getHolaMundoFromMS1,
+  getProfesores,
+  getProfesorPorId,
+  getAsignaturas,
+  getAsignaturaPorId,
+  crearProfesor,
+  actualizarProfesor,
+  eliminarProfesor,
+  crearAsignatura,
+  asignarProfesorAAsignatura
+} = require('../services/professorService.js');
+
+const {
+  getHolaMundoFromMS2,
+  getCalificaciones,
+  registrarCalificacion,
+  actualizarCalificacion,
+  eliminarCalificacion
+} = require('../services/subjectService.js');
+
+const resolvers = {
+  Query: {
+    holaMundo1: async () => getHolaMundoFromMS1(),
+    profesores: async () => getProfesores(),
+    profesorPorId: async (_, { id }) => getProfesorPorId(id),
+    asignaturas: async () => getAsignaturas(),
+    asignaturaPorId: async (_, { id }) => getAsignaturaPorId(id),
+
+    holaMundo2: async () => getHolaMundoFromMS2(),
+    calificaciones: async (_, args) => getCalificaciones(args)
+  },
+
+  Mutation: {
+    crearProfesor: async (_, { nombre, documento, area }) =>
+      crearProfesor({ nombre, documento, area }),
+    actualizarProfesor: async (_, { id, nombre, area }) =>
+      actualizarProfesor({ id, nombre, area }),
+    eliminarProfesor: async (_, { id }) => eliminarProfesor({ id }),
+
+    crearAsignatura: async (_, { nombre }) => crearAsignatura({ nombre }),
+    asignarProfesorAAsignatura: async (_, { profesorId, asignaturaId }) =>
+      asignarProfesorAAsignatura({ profesorId, asignaturaId }),
+
+    registrarCalificacion: async (
+      _,
+      { estudianteId, asignaturaId, cursoId, periodo, nota, observaciones }
+    ) =>
+      registrarCalificacion({
+        estudianteId,
+        asignaturaId,
+        cursoId,
+        periodo,
+        nota,
+        observaciones
+      }),
+    actualizarCalificacion: async (_, { id, nota }) =>
+      actualizarCalificacion({ id, nota }),
+    eliminarCalificacion: async (_, { id }) => eliminarCalificacion({ id })
   }
 };
 

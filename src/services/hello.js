@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+/* const fetch = require('node-fetch');
 
 async function fetchHolaMundo(url) {
   const response = await fetch(url, {
@@ -10,4 +10,4 @@ async function fetchHolaMundo(url) {
   return json.data.holaMundo;
 }
 
-module.exports = { fetchHolaMundo };
+module.exports = { fetchHolaMundo }; */
