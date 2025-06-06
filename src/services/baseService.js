@@ -1,13 +1,13 @@
 const fetch = require("node-fetch");
-const { MS1_URL } = require("../config/environment"); // Importamos la URL de MS1 desde environment.js
-const { MS2_URL } = require('../config/environment');  // Importamos la URL de MS2 desde environment.js
+const { GX_BE_PROASIG_URL } = require("../config/environment"); // Importamos la URL de MS1 desde environment.js
+const { GX_BE_CALIF_URL } = require('../config/environment');  // Importamos la URL de MS2 desde environment.js
 
 
 
 
 // Helper para invocar cualquier query o mutation a MS1
-async function invokeMS1(queryBody, variables = {}) {
-  const response = await fetch(MS1_URL, {
+async function invokeBEPROASIG(queryBody, variables = {}) {
+  const response = await fetch(GX_BE_PROASIG_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -24,8 +24,8 @@ async function invokeMS1(queryBody, variables = {}) {
 
 
 // Helper para invocar cualquier query o mutation a MS2
-async function invokeMS2(queryBody, variables = {}) {
-  const response = await fetch(MS2_URL, {
+async function invokeBECALIF(queryBody, variables = {}) {
+  const response = await fetch(GX_BE_CALIF_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -41,5 +41,6 @@ async function invokeMS2(queryBody, variables = {}) {
 }
 
 module.exports = {
-    invokeMS1,invokeMS2
+    invokeBEPROASIG,
+    invokeBECALIF
 }

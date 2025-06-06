@@ -11,15 +11,10 @@ services:
       - "9000:4000"
     environment:
       # Estas URLs apuntan a tus microservicios en el host (puertos 8080 y 8081)
-      MS1_URL: "http://host.docker.internal:8080/graphql"
-      MS2_URL: "http://host.docker.internal:8081/graphql"
+      GX_BE_PROASIG_URL: "http://host.docker.internal:8080/graphql"
+      GX_BE_CALIF_URL: "http://host.docker.internal:8081/graphql"
       PORT: 4000
     # Agregamos este bloque para que "host.docker.internal" se resuelva a la IP del host
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
-    # --- Elimina por completo la sección depends_on, ya que esos servicios NO
-    #     se definen en este mismo compose.
-    # depends_on:
-    #   - component-2-1
-    #   - component-2-2

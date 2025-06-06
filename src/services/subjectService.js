@@ -1,7 +1,7 @@
-const {invokeMS1} = require('./baseService')
+const {invokeBECALIF} = require('./baseService')
 
 /**
- * Invoca MS1 → { asignaturas { id nombre profesorIds } }
+ * Invoca BECALIF → { asignaturas { id nombre profesorIds } }
  */
 async function getAsignaturas() {
   const query = `
@@ -13,12 +13,12 @@ async function getAsignaturas() {
       }
     }
   `;
-  const data = await invokeMS1(query);
+  const data = await invokeBECALIF(query);
   return data.asignaturas; // [ { id, nombre, profesorIds }, ... ]
 }
 
 /**
- * Invoca MS1 → { asignaturaPorId(id: $id) { id nombre profesorIds } }
+ * Invoca BECALIF → { asignaturaPorId(id: $id) { id nombre profesorIds } }
  * @param {string} id
  */
 async function getAsignaturaPorId(id) {
@@ -31,12 +31,12 @@ async function getAsignaturaPorId(id) {
       }
     }
   `;
-  const data = await invokeMS1(query, { id });
+  const data = await invokeBECALIF(query, { id });
   return data.asignaturaPorId; // { id, nombre, profesorIds } o null
 }
 
 /**
- * Invoca MS1 → mutation { crearAsignatura(nombre:$nombre) { id nombre profesorIds } }
+ * Invoca BECALIF → mutation { crearAsignatura(nombre:$nombre) { id nombre profesorIds } }
  * @param {object} input – { nombre: string }
  */
 async function crearAsignatura({ nombre }) {
@@ -49,12 +49,12 @@ async function crearAsignatura({ nombre }) {
       }
     }
   `;
-  const data = await invokeMS1(mutation, { nombre });
+  const data = await invokeBECALIF(mutation, { nombre });
   return data.crearAsignatura; // { id, nombre, profesorIds }
 }
 
 /**
- * Invoca MS1 → mutation { asignarProfesorAAsignatura(profesorId:$profesorId, asignaturaId:$asignaturaId) { id nombre profesorIds } }
+ * Invoca BECALIF → mutation { asignarProfesorAAsignatura(profesorId:$profesorId, asignaturaId:$asignaturaId) { id nombre profesorIds } }
  * @param {object} input – { profesorId: string, asignaturaId: string }
  */
 async function asignarProfesorAAsignatura({ profesorId, asignaturaId }) {
@@ -67,7 +67,7 @@ async function asignarProfesorAAsignatura({ profesorId, asignaturaId }) {
       }
     }
   `;
-  const data = await invokeMS1(mutation, { profesorId, asignaturaId });
+  const data = await invokeBECALIF(mutation, { profesorId, asignaturaId });
   return data.asignarProfesorAAsignatura; // { id, nombre, profesorIds }
 }
 
