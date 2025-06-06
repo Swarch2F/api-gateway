@@ -36,7 +36,7 @@ El API Gateway está construido como un punto de entrada unificado que interact�
 - Manejo de entornos mediante variables
 
 ## Flujo de Datos
-1. Cliente hace petición GraphQL al Gateway (puerto 4000)
+1. Cliente hace petición GraphQL al Gateway (puerto 9000)
 2. Gateway resuelve la petición usando los servicios apropiados
 3. Los servicios se comunican con MS1 o MS2 según corresponda
 4. La respuesta se devuelve al cliente en formato GraphQL
