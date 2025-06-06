@@ -16,14 +16,20 @@ const {
   getHolaMundoFromMS1,
   getProfesores,
   getProfesorPorId,
-  getAsignaturas,
-  getAsignaturaPorId,
   crearProfesor,
   actualizarProfesor,
   eliminarProfesor,
+
+} = require('../services/professorService.js');
+
+const {
+
+  getAsignaturas,
+  getAsignaturaPorId,
   crearAsignatura,
   asignarProfesorAAsignatura
-} = require('../services/professorService.js');
+} = require('../services/subjectService.js');
+
 
 const {
   getHolaMundoFromMS2,
@@ -31,7 +37,7 @@ const {
   registrarCalificacion,
   actualizarCalificacion,
   eliminarCalificacion
-} = require('../services/subjectService.js');
+} = require('../services/gradesService.js');
 
 const resolvers = {
   Query: {

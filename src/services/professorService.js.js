@@ -1,23 +1,4 @@
-// ms1.js
-const fetch = require('node-fetch');
-const { MS1_URL } = require('../config/environment');  // Importamos la URL de MS1 desde environment.js
-
-// Helper para invocar cualquier query o mutation a MS1
-async function invokeMS1(queryBody, variables = {}) {
-  const response = await fetch(MS1_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      query: queryBody,
-      variables
-    })
-  });
-  const { data, errors } = await response.json();
-  if (errors) {
-    throw new Error(`MS1 Error: ${JSON.stringify(errors)}`);
-  }
-  return data;
-}
+const {invokeMS1} = require('./baseService')
 
 // —————— OPERACIÓN “holaMundo” ——————
 
@@ -69,40 +50,9 @@ async function getProfesorPorId(id) {
   return data.profesorPorId; // { id, nombre, documento, area } o null
 }
 
-/**
- * Invoca MS1 → { asignaturas { id nombre profesorIds } }
- */
-async function getAsignaturas() {
-  const query = `
-    query {
-      asignaturas {
-        id
-        nombre
-        profesorIds
-      }
-    }
-  `;
-  const data = await invokeMS1(query);
-  return data.asignaturas; // [ { id, nombre, profesorIds }, ... ]
-}
 
-/**
- * Invoca MS1 → { asignaturaPorId(id: $id) { id nombre profesorIds } }
- * @param {string} id
- */
-async function getAsignaturaPorId(id) {
-  const query = `
-    query ($id: ID!) {
-      asignaturaPorId(id: $id) {
-        id
-        nombre
-        profesorIds
-      }
-    }
-  `;
-  const data = await invokeMS1(query, { id });
-  return data.asignaturaPorId; // { id, nombre, profesorIds } o null
-}
+
+
 
 // —————— MUTATIONS de Profesor y Asignatura ——————
 
@@ -158,51 +108,14 @@ async function eliminarProfesor({ id }) {
   return data.eliminarProfesor; // true o false
 }
 
-/**
- * Invoca MS1 → mutation { crearAsignatura(nombre:$nombre) { id nombre profesorIds } }
- * @param {object} input – { nombre: string }
- */
-async function crearAsignatura({ nombre }) {
-  const mutation = `
-    mutation ($nombre: String!) {
-      crearAsignatura(nombre: $nombre) {
-        id
-        nombre
-        profesorIds
-      }
-    }
-  `;
-  const data = await invokeMS1(mutation, { nombre });
-  return data.crearAsignatura; // { id, nombre, profesorIds }
-}
 
-/**
- * Invoca MS1 → mutation { asignarProfesorAAsignatura(profesorId:$profesorId, asignaturaId:$asignaturaId) { id nombre profesorIds } }
- * @param {object} input – { profesorId: string, asignaturaId: string }
- */
-async function asignarProfesorAAsignatura({ profesorId, asignaturaId }) {
-  const mutation = `
-    mutation ($profesorId: ID!, $asignaturaId: ID!) {
-      asignarProfesorAAsignatura(profesorId: $profesorId, asignaturaId: $asignaturaId) {
-        id
-        nombre
-        profesorIds
-      }
-    }
-  `;
-  const data = await invokeMS1(mutation, { profesorId, asignaturaId });
-  return data.asignarProfesorAAsignatura; // { id, nombre, profesorIds }
-}
 
 module.exports = {
   getHolaMundoFromMS1,
   getProfesores,
   getProfesorPorId,
-  getAsignaturas,
-  getAsignaturaPorId,
   crearProfesor,
   actualizarProfesor,
   eliminarProfesor,
-  crearAsignatura,
-  asignarProfesorAAsignatura
+
 };

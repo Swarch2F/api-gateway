@@ -1,138 +1,79 @@
-// ms2.js
-const fetch = require('node-fetch');
-const { MS2_URL } = require('../config/environment');  // Importamos la URL de MS2 desde environment.js
-
-// Helper para invocar cualquier query o mutation a MS2
-async function invokeMS2(queryBody, variables = {}) {
-  const response = await fetch(MS2_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      query: queryBody,
-      variables
-    })
-  });
-  const { data, errors } = await response.json();
-  if (errors) {
-    throw new Error(`MS2 Error: ${JSON.stringify(errors)}`);
-  }
-  return data;
-}
-
-// —————— OPERACIÓN “holaMundo” ——————
+const {invokeMS1} = require('./baseService')
 
 /**
- * Invoca MS2 → { holaMundo }
+ * Invoca MS1 → { asignaturas { id nombre profesorIds } }
  */
-async function getHolaMundoFromMS2() {
-  const query = `query { holaMundo }`;
-  const data = await invokeMS2(query);
-  return data.holaMundo;
-}
-
-// —————— QUERIES de Calificaciones ——————
-
-/**
- * Invoca MS2 → { calificaciones(estudianteId:$estudianteId, asignaturaId:$asignaturaId, cursoId:$cursoId, periodo:$periodo) { id estudianteId asignaturaId cursoId periodo nota observaciones } }
- * @param {object} filters – { estudianteId?: string, asignaturaId?: string, cursoId?: string, periodo?: string }
- */
-async function getCalificaciones({ estudianteId, asignaturaId, cursoId, periodo }) {
+async function getAsignaturas() {
   const query = `
-    query ($estudianteId: ID, $asignaturaId: ID, $cursoId: ID, $periodo: String) {
-      calificaciones(
-        estudianteId: $estudianteId,
-        asignaturaId: $asignaturaId,
-        cursoId: $cursoId,
-        periodo: $periodo
-      ) {
+    query {
+      asignaturas {
         id
-        estudianteId
-        asignaturaId
-        cursoId
-        periodo
-        nota
-        observaciones
+        nombre
+        profesorIds
       }
     }
   `;
-  const variables = { estudianteId, asignaturaId, cursoId, periodo };
-  const data = await invokeMS2(query, variables);
-  return data.calificaciones;
+  const data = await invokeMS1(query);
+  return data.asignaturas; // [ { id, nombre, profesorIds }, ... ]
 }
 
-// —————— MUTATIONS de Calificación ——————
-
 /**
- * Invoca MS2 → mutation { registrarCalificacion(estudianteId:$estudianteId, asignaturaId:$asignaturaId, cursoId:$cursoId, periodo:$periodo, nota:$nota, observaciones:$observaciones) { id estudianteId asignaturaId nota observaciones } }
- * @param {object} input – { estudianteId: string, asignaturaId: string, cursoId: string, periodo: string, nota: number, observaciones: string }
+ * Invoca MS1 → { asignaturaPorId(id: $id) { id nombre profesorIds } }
+ * @param {string} id
  */
-async function registrarCalificacion({ estudianteId, asignaturaId, cursoId, periodo, nota, observaciones }) {
-  const mutation = `
-    mutation (
-      $estudianteId: ID!,
-      $asignaturaId: ID!,
-      $cursoId: ID!,
-      $periodo: String!,
-      $nota: Float!,
-      $observaciones: String
-    ) {
-      registrarCalificacion(
-        estudianteId: $estudianteId,
-        asignaturaId: $asignaturaId,
-        cursoId: $cursoId,
-        periodo: $periodo,
-        nota: $nota,
-        observaciones: $observaciones
-      ) {
+async function getAsignaturaPorId(id) {
+  const query = `
+    query ($id: ID!) {
+      asignaturaPorId(id: $id) {
         id
-        estudianteId
-        asignaturaId
-        nota
-        observaciones
+        nombre
+        profesorIds
       }
     }
   `;
-  const variables = { estudianteId, asignaturaId, cursoId, periodo, nota, observaciones };
-  const data = await invokeMS2(mutation, variables);
-  return data.registrarCalificacion;
+  const data = await invokeMS1(query, { id });
+  return data.asignaturaPorId; // { id, nombre, profesorIds } o null
 }
 
 /**
- * Invoca MS2 → mutation { actualizarCalificacion(id:$id, nota:$nota) { id nota observaciones } }
- * @param {object} input – { id: string, nota: number }
+ * Invoca MS1 → mutation { crearAsignatura(nombre:$nombre) { id nombre profesorIds } }
+ * @param {object} input – { nombre: string }
  */
-async function actualizarCalificacion({ id, nota }) {
+async function crearAsignatura({ nombre }) {
   const mutation = `
-    mutation ($id: ID!, $nota: Float!) {
-      actualizarCalificacion(id: $id, nota: $nota) {
+    mutation ($nombre: String!) {
+      crearAsignatura(nombre: $nombre) {
         id
-        nota
-        observaciones
+        nombre
+        profesorIds
       }
     }
   `;
-  const data = await invokeMS2(mutation, { id, nota });
-  return data.actualizarCalificacion;
+  const data = await invokeMS1(mutation, { nombre });
+  return data.crearAsignatura; // { id, nombre, profesorIds }
 }
 
 /**
- * Invoca MS2 → mutation { eliminarCalificacion(id:$id) }
- * @param {object} input – { id: string }
+ * Invoca MS1 → mutation { asignarProfesorAAsignatura(profesorId:$profesorId, asignaturaId:$asignaturaId) { id nombre profesorIds } }
+ * @param {object} input – { profesorId: string, asignaturaId: string }
  */
-async function eliminarCalificacion({ id }) {
+async function asignarProfesorAAsignatura({ profesorId, asignaturaId }) {
   const mutation = `
-    mutation ($id: ID!) {
-      eliminarCalificacion(id: $id)
+    mutation ($profesorId: ID!, $asignaturaId: ID!) {
+      asignarProfesorAAsignatura(profesorId: $profesorId, asignaturaId: $asignaturaId) {
+        id
+        nombre
+        profesorIds
+      }
     }
   `;
-  const data = await invokeMS2(mutation, { id });
-  return data.eliminarCalificacion; // true o false
+  const data = await invokeMS1(mutation, { profesorId, asignaturaId });
+  return data.asignarProfesorAAsignatura; // { id, nombre, profesorIds }
 }
 
 module.exports = {
-  getHolaMundoFromMS2,
-  getCalificaciones,
-  registrarCalificacion,
-  actualizarCalificacion,
-  eliminarCalificacion
+  getAsignaturas,
+  getAsignaturaPorId,
+  crearAsignatura,
+  asignarProfesorAAsignatura,
 };
