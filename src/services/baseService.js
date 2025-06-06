@@ -1,6 +1,6 @@
 const fetch = require("node-fetch");
-const { GX_BE_PROASIG_URL } = require("../config/environment"); // Importamos la URL de MS1 desde environment.js
-const { GX_BE_CALIF_URL } = require('../config/environment');  // Importamos la URL de MS2 desde environment.js
+const { GX_BE_PROASIG_URL } = require("../configs/config"); // Importamos la URL de MS1 desde environment.js
+const { GX_BE_CALIF_URL } = require('../configs/config');  // Importamos la URL de MS2 desde environment.js
 
 /**
  * Helper para invocar cualquier query o mutation a MS1

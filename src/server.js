@@ -1,8 +1,8 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const { typeDefs } = require('./schema/typeDefs');
-const resolvers = require('./schema/resolvers');
-const { PORT } = require('./config/environment');
+const resolvers = require('./resolvers/graphql/resolvers');
+const { PORT } = require('./configs/config');
 
 async function startServer() {
   const apolloServer = new ApolloServer({ typeDefs, resolvers });

@@ -15,14 +15,14 @@ const {
   actualizarProfesor,
   eliminarProfesor,
 
-} = require('../services/professorService.js');
+} = require('../../services/professorService.js.js');
 
 const {
   getAsignaturas,
   getAsignaturaPorId,
   crearAsignatura,
   asignarProfesorAAsignatura
-} = require('../services/subjectService.js');
+} = require('../../services/subjectService.js');
 
 const {
   getHolaMundoFromBECALIF,
@@ -30,7 +30,7 @@ const {
   registrarCalificacion,
   actualizarCalificacion,
   eliminarCalificacion
-} = require('../services/gradesService.js');
+} = require('../../services/gradesService.js');
 
 /**
  * Los resolvers para las operaciones de lectura
