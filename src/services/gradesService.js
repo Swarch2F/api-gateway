@@ -1,9 +1,10 @@
-const {invokeBECALIF} = require('./baseService')
+const { invokeBECALIF } = require('./baseService');
 
 // —————— OPERACIÓN “holaMundo” ——————
 
 /**
  * Invoca BECALIF → { holaMundo }
+ * @returns {Promise<string>} El string "holaMundo" desde el servicio BECALIF
  */
 async function getHolaMundoFromBECALIF() {
   const query = `query { holaMundo }`;
@@ -16,6 +17,7 @@ async function getHolaMundoFromBECALIF() {
 /**
  * Invoca BECALIF → { calificaciones(estudianteId:$estudianteId, asignaturaId:$asignaturaId, cursoId:$cursoId, periodo:$periodo) { id estudianteId asignaturaId cursoId periodo nota observaciones } }
  * @param {object} filters – { estudianteId?: string, asignaturaId?: string, cursoId?: string, periodo?: string }
+ * @returns {Promise<Calificacion[]>} Un array de objetos Calificación { id, estudianteId, asignaturaId, cursoId, periodo, nota, observaciones } que coinciden con los filtros
  */
 async function getCalificaciones({ estudianteId, asignaturaId, cursoId, periodo }) {
   const query = `
@@ -46,6 +48,7 @@ async function getCalificaciones({ estudianteId, asignaturaId, cursoId, periodo 
 /**
  * Invoca BECALIF → mutation { registrarCalificacion(estudianteId:$estudianteId, asignaturaId:$asignaturaId, cursoId:$cursoId, periodo:$periodo, nota:$nota, observaciones:$observaciones) { id estudianteId asignaturaId nota observaciones } }
  * @param {object} input – { estudianteId: string, asignaturaId: string, cursoId: string, periodo: string, nota: number, observaciones: string }
+ * @returns {Promise<Calificacion>} El objeto Calificación { id, estudianteId, asignaturaId, nota, observaciones } recién creado
  */
 async function registrarCalificacion({ estudianteId, asignaturaId, cursoId, periodo, nota, observaciones }) {
   const mutation = `
@@ -81,6 +84,7 @@ async function registrarCalificacion({ estudianteId, asignaturaId, cursoId, peri
 /**
  * Invoca BECALIF → mutation { actualizarCalificacion(id:$id, nota:$nota) { id nota observaciones } }
  * @param {object} input – { id: string, nota: number }
+ * @returns {Promise<Calificacion>} El objeto Calificación { id, nota, observaciones } actualizado
  */
 async function actualizarCalificacion({ id, nota }) {
   const mutation = `
@@ -99,6 +103,7 @@ async function actualizarCalificacion({ id, nota }) {
 /**
  * Invoca BECALIF → mutation { eliminarCalificacion(id:$id) }
  * @param {object} input – { id: string }
+ * @returns {Promise<boolean>} True si se eliminó la calificación, false si no se encontró
  */
 async function eliminarCalificacion({ id }) {
   const mutation = `
@@ -117,3 +122,4 @@ module.exports = {
   actualizarCalificacion,
   eliminarCalificacion
 };
+

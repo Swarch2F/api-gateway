@@ -1,9 +1,10 @@
-const {invokeBEPROASIG} = require('./baseService')
+const { invokeBEPROASIG } = require('./baseService');
 
 // —————— OPERACIÓN “holaMundo” ——————
 
 /**
- * Invoca BEPROASIG → { holaMundo }
+ * Invokes BEPROASIG to fetch a simple greeting message.
+ * @returns {Promise<string>} The "holaMundo" string from the service.
  */
 async function getHolaMundoFromBEPROASIG() {
   const query = `query { holaMundo }`;
@@ -14,7 +15,8 @@ async function getHolaMundoFromBEPROASIG() {
 // —————— QUERIES de Profesores y Asignaturas ——————
 
 /**
- * Invoca BEPROASIG → { profesores { id nombre documento area } }
+ * Invokes BEPROASIG to fetch all professors.
+ * @returns {Promise<Array>} An array of professor objects, each containing id, nombre, documento, and area.
  */
 async function getProfesores() {
   const query = `
@@ -28,12 +30,13 @@ async function getProfesores() {
     }
   `;
   const data = await invokeBEPROASIG(query);
-  return data.profesores; // [ { id, nombre, documento, area }, ... ]
+  return data.profesores;
 }
 
 /**
- * Invoca BEPROASIG → { profesorPorId(id: $id) { id nombre documento area } }
- * @param {string} id
+ * Invokes BEPROASIG to fetch a professor by their ID.
+ * @param {string} id - The ID of the professor to retrieve.
+ * @returns {Promise<Object|null>} The professor object or null if not found, containing id, nombre, documento, and area.
  */
 async function getProfesorPorId(id) {
   const query = `
@@ -47,18 +50,18 @@ async function getProfesorPorId(id) {
     }
   `;
   const data = await invokeBEPROASIG(query, { id });
-  return data.profesorPorId; // { id, nombre, documento, area } o null
+  return data.profesorPorId;
 }
-
-
-
-
 
 // —————— MUTATIONS de Profesor y Asignatura ——————
 
 /**
- * Invoca BEPROASIG → mutation { crearProfesor(nombre:$nombre, documento:$documento, area:$area) { id nombre area } }
- * @param {object} input  – { nombre: string, documento: string, area: string }
+ * Invokes BEPROASIG to create a new professor.
+ * @param {Object} input - The input data for creating a professor.
+ * @param {string} input.nombre - The name of the professor.
+ * @param {string} input.documento - The document identifier of the professor.
+ * @param {string} input.area - The area of expertise of the professor.
+ * @returns {Promise<Object>} The created professor object containing id, nombre, and area.
  */
 async function crearProfesor({ nombre, documento, area }) {
   const mutation = `
@@ -71,12 +74,16 @@ async function crearProfesor({ nombre, documento, area }) {
     }
   `;
   const data = await invokeBEPROASIG(mutation, { nombre, documento, area });
-  return data.crearProfesor; // { id, nombre, area }
+  return data.crearProfesor;
 }
 
 /**
- * Invoca BEPROASIG → mutation { actualizarProfesor(id:$id, nombre:$nombre, area:$area) { id nombre area documento } }
- * @param {object} input – { id: string, nombre?: string, area?: string }
+ * Invokes BEPROASIG to update an existing professor's details.
+ * @param {Object} input - The input data for updating a professor.
+ * @param {string} input.id - The ID of the professor to update.
+ * @param {string=} input.nombre - The new name of the professor (optional).
+ * @param {string=} input.area - The new area of expertise of the professor (optional).
+ * @returns {Promise<Object>} The updated professor object containing id, nombre, area, and documento.
  */
 async function actualizarProfesor({ id, nombre, area }) {
   const mutation = `
@@ -91,12 +98,14 @@ async function actualizarProfesor({ id, nombre, area }) {
   `;
   const variables = { id, nombre, area };
   const data = await invokeBEPROASIG(mutation, variables);
-  return data.actualizarProfesor; // { id, nombre, area, documento }
+  return data.actualizarProfesor;
 }
 
 /**
- * Invoca BEPROASIG → mutation { eliminarProfesor(id:$id) }
- * @param {object} input – { id: string }
+ * Invokes BEPROASIG to delete a professor by their ID.
+ * @param {Object} input - The input data for deleting a professor.
+ * @param {string} input.id - The ID of the professor to delete.
+ * @returns {Promise<boolean>} True if the deletion was successful, otherwise false.
  */
 async function eliminarProfesor({ id }) {
   const mutation = `
@@ -105,10 +114,8 @@ async function eliminarProfesor({ id }) {
     }
   `;
   const data = await invokeBEPROASIG(mutation, { id });
-  return data.eliminarProfesor; // true o false
+  return data.eliminarProfesor;
 }
-
-
 
 module.exports = {
   getHolaMundoFromBEPROASIG,
@@ -117,5 +124,5 @@ module.exports = {
   crearProfesor,
   actualizarProfesor,
   eliminarProfesor,
-
 };
+

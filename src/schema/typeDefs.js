@@ -20,3 +20,4 @@ const typeDefs = [baseTypes, professorTypes, subjectTypes, gradesTypes];
 
 module.exports = { typeDefs };
 
+
