@@ -21,7 +21,7 @@ async function startServer() {
   apolloServer.applyMiddleware({ app, path: '/graphql' });
 
   app.listen(PORT, () => {
-    console.log(`API Gateway corriendo en puerto ${PORT}`);
+    console.log(`API Gateway corriendo exitosamente con Apollo`);
   });
 }
 
