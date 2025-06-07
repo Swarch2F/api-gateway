@@ -1,0 +1,920 @@
+{
+	"info": {
+		"_postman_id": "12345678-abcd-1234-5678-123456789012",
+		"name": "API Gateway - Ecosistema Completo (35 Endpoints)",
+		"description": "Colección completa para probar todos los microservicios integrados en el API Gateway.\n\n**MICROSERVICIOS INCLUIDOS:**\n- 🔒 Component-4 (Autenticación) - 4 endpoints\n- 🎓 Component-1 (SIA Colegios) - 15 endpoints \n- 👨‍🏫 Component-2-1 (Profesores) - 9 endpoints\n- 📊 Component-2-2 (Calificaciones) - 5 endpoints\n- 🛠️ Utilidades - 2 endpoints\n\n**TOTAL: 35 ENDPOINTS**\n\n**VARIABLES AUTOMÁTICAS:**\n- jwt_token, curso_id, estudiante_id, profesor_id, asignatura_id, calificacion_id",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔒 1. Autenticación (4 endpoints)",
+			"item": [
+				{
+					"name": "Login Usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const response = pm.response.json();",
+									"  if (response.data && response.data.loginUser && response.data.loginUser.token) {",
+									"    pm.collectionVariables.set('jwt_token', response.data.loginUser.token);",
+									"    console.log('✅ Token JWT guardado correctamente');",
+									"  }",
+									"} else {",
+									"  console.log('❌ Error en login:', pm.response.text());",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { loginUser(input: { email: \\\"test@example.com\\\", password: \\\"password123\\\" }) { token message } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Registro Usuario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { registerUser(input: { email: \\\"nuevo@example.com\\\", password: \\\"password123\\\" }) { message } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Perfil Usuario (requiere token)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { userProfile { message user_id } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "URL Login Google",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { getGoogleLoginUrl }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🎓 2. SIA Colegios - Cursos (7 endpoints)",
+			"item": [
+				{
+					"name": "Listar Cursos (con filtros)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { cursos(search: \\\"A\\\", ordering: \\\"nombre\\\", page: 1) { count next previous results { id nombre codigo estudiantes { id nombreCompleto documento } } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Obtener Curso por ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { curso(id: \\\"1\\\") { id nombre codigo estudiantes { id nombreCompleto documento } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Estudiantes de Curso",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { cursoEstudiantes(id: \\\"1\\\") { id nombreCompleto documento fechaNacimiento acudiente } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Crear Curso",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const response = pm.response.json();",
+									"  if (response.data && response.data.crearCurso && response.data.crearCurso.id) {",
+									"    pm.collectionVariables.set('curso_id', response.data.crearCurso.id);",
+									"    console.log('✅ Curso creado con ID:', response.data.crearCurso.id);",
+									"  }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { crearCurso(input: { nombre: \\\"Doce A\\\", codigo: \\\"12-A\\\" }) { id nombre codigo } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Curso Completo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { actualizarCurso(id: \\\"{{curso_id}}\\\", input: { nombre: \\\"Doce A Actualizado\\\", codigo: \\\"12-A-UPD\\\" }) { id nombre codigo } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Curso Parcial",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { actualizarCursoParcial(id: \\\"{{curso_id}}\\\", nombre: \\\"Doce A Parcial\\\") { id nombre codigo } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Curso",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { eliminarCurso(id: \\\"{{curso_id}}\\\") }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "👨‍🎓 3. SIA Colegios - Estudiantes (8 endpoints)",
+			"item": [
+				{
+					"name": "Listar Estudiantes (con filtros)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { estudiantes(search: \\\"Ana\\\", ordering: \\\"nombreCompleto\\\", page: 1) { count next previous results { id nombreCompleto documento fechaNacimiento acudiente curso { nombre codigo } } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Obtener Estudiante por ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { estudiante(id: \\\"1\\\") { id nombreCompleto documento fechaNacimiento acudiente curso { nombre codigo } fechaRegistro } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Estudiantes por Código de Curso",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { estudiantesPorCurso(codigo: \\\"1-A\\\") { id nombreCompleto documento curso { nombre codigo } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Crear Estudiante",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const response = pm.response.json();",
+									"  if (response.data && response.data.crearEstudiante && response.data.crearEstudiante.id) {",
+									"    pm.collectionVariables.set('estudiante_id', response.data.crearEstudiante.id);",
+									"    console.log('✅ Estudiante creado con ID:', response.data.crearEstudiante.id);",
+									"  }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { crearEstudiante(input: { nombreCompleto: \\\"Ana María Rodríguez\\\", documento: \\\"1234567890\\\", fechaNacimiento: \\\"2010-05-15\\\", acudiente: \\\"Carlos Rodríguez\\\", curso: \\\"1\\\" }) { id nombreCompleto documento curso { nombre codigo } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Estudiante Completo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { actualizarEstudiante(id: \\\"{{estudiante_id}}\\\", input: { nombreCompleto: \\\"Ana María Rodríguez Actualizada\\\", documento: \\\"1234567890\\\", fechaNacimiento: \\\"2010-05-15\\\", acudiente: \\\"Carlos Rodríguez Actualizado\\\", curso: \\\"2\\\" }) { id nombreCompleto acudiente curso { nombre codigo } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Estudiante Parcial",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { actualizarEstudianteParcial(id: \\\"{{estudiante_id}}\\\", acudiente: \\\"Nuevo Acudiente\\\", curso: \\\"3\\\") { id nombreCompleto acudiente curso { nombre codigo } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Transferir Estudiante de Curso",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { actualizarEstudianteParcial(id: \\\"{{estudiante_id}}\\\", curso: \\\"4\\\") { id nombreCompleto curso { nombre codigo } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Estudiante",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { eliminarEstudiante(id: \\\"{{estudiante_id}}\\\") }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "👨‍🏫 4. Profesores & Asignaturas (9 endpoints)",
+			"item": [
+				{
+					"name": "Listar Profesores",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { profesores { id nombre documento area } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Crear Profesor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const response = pm.response.json();",
+									"  if (response.data && response.data.crearProfesor && response.data.crearProfesor.id) {",
+									"    pm.collectionVariables.set('profesor_id', response.data.crearProfesor.id);",
+									"    console.log('✅ Profesor creado con ID:', response.data.crearProfesor.id);",
+									"  }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { crearProfesor(nombre: \\\"Dr. María García\\\", documento: \\\"CC87654321\\\", area: \\\"Matemáticas\\\") { id nombre documento area } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Profesor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { actualizarProfesor(id: \\\"{{profesor_id}}\\\", nombre: \\\"Dr. María García Actualizada\\\", area: \\\"Matemáticas Avanzadas\\\") { id nombre documento area } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Profesor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { eliminarProfesor(id: \\\"{{profesor_id}}\\\") }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Listar Asignaturas",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { asignaturas { id nombre profesorIds } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Crear Asignatura",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const response = pm.response.json();",
+									"  if (response.data && response.data.crearAsignatura && response.data.crearAsignatura.id) {",
+									"    pm.collectionVariables.set('asignatura_id', response.data.crearAsignatura.id);",
+									"    console.log('✅ Asignatura creada con ID:', response.data.crearAsignatura.id);",
+									"  }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { crearAsignatura(nombre: \\\"Álgebra Lineal\\\") { id nombre profesorIds } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Asignatura",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { actualizarAsignatura(id: \\\"{{asignatura_id}}\\\", nombre: \\\"Álgebra Lineal Avanzada\\\") { id nombre profesorIds } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Asignar Profesor a Asignatura",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { asignarProfesorAAsignatura(profesorId: \\\"{{profesor_id}}\\\", asignaturaId: \\\"{{asignatura_id}}\\\") { id nombre profesorIds } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Desasignar Profesor de Asignatura",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { desasignarProfesorDeAsignatura(profesorId: \\\"{{profesor_id}}\\\", asignaturaId: \\\"{{asignatura_id}}\\\") { id nombre profesorIds } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📊 5. Calificaciones (5 endpoints)",
+			"item": [
+				{
+					"name": "Listar Calificaciones (con filtros)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { calificaciones(periodo: \\\"2025-1\\\") { id estudianteId asignaturaId cursoId periodo nota observaciones } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Registrar Calificación",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"  const response = pm.response.json();",
+									"  if (response.data && response.data.registrarCalificacion && response.data.registrarCalificacion.id) {",
+									"    pm.collectionVariables.set('calificacion_id', response.data.registrarCalificacion.id);",
+									"    console.log('✅ Calificación registrada con ID:', response.data.registrarCalificacion.id);",
+									"  }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { registrarCalificacion(estudianteId: \\\"est-12345\\\", asignaturaId: \\\"{{asignatura_id}}\\\", cursoId: \\\"11-A\\\", periodo: \\\"2025-1\\\", nota: 4.5, observaciones: \\\"Excelente desempeño\\\") { id estudianteId nota observaciones } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Calificación",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { actualizarCalificacion(id: \\\"{{calificacion_id}}\\\", nota: 4.8, observaciones: \\\"Desempeño mejorado\\\") { id nota observaciones } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Calificación",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { eliminarCalificacion(id: \\\"{{calificacion_id}}\\\") }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Calificaciones por Periodo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { calificaciones(periodo: \\\"2025-1\\\", cursoId: \\\"11-A\\\") { id estudianteId asignaturaId nota observaciones } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🛠️ 6. Utilidades (2 endpoints)",
+			"item": [
+				{
+					"name": "Health Check MS Profesores",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { holaMundo1 }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				},
+				{
+					"name": "Health Check MS Calificaciones",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { holaMundo2 }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": ["{{base_url}}"],
+							"path": ["graphql"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:9000",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "curso_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "estudiante_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "profesor_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "asignatura_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "calificacion_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+} 

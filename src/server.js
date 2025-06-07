@@ -6,7 +6,13 @@ const resolvers = require('./resolvers/graphql/resolvers');
 const { PORT } = require('./configs/config');
 
 async function startServer() {
-  const apolloServer = new ApolloServer({ typeDefs, resolvers });
+  const apolloServer = new ApolloServer({ 
+    typeDefs, 
+    resolvers,
+    context: ({ req }) => ({
+      req
+    })
+  });
   await apolloServer.start();
 
   const app = express();

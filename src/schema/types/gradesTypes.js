@@ -12,6 +12,7 @@ const gradesTypes = gql`
   }
 
   extend type Query {
+    # Consultar calificaciones con filtros opcionales
     calificaciones(
       estudianteId: ID,
       asignaturaId: ID,
@@ -21,6 +22,7 @@ const gradesTypes = gql`
   }
 
   extend type Mutation {
+    # Registrar nueva calificación
     registrarCalificacion(
       estudianteId: ID!,
       asignaturaId: ID!,
@@ -30,7 +32,14 @@ const gradesTypes = gql`
       observaciones: String
     ): Calificacion
 
-    actualizarCalificacion(id: ID!, nota: Float!): Calificacion
+    # Actualizar calificación existente (nota y/o observaciones)
+    actualizarCalificacion(
+      id: ID!, 
+      nota: Float, 
+      observaciones: String
+    ): Calificacion
+    
+    # Eliminar calificación
     eliminarCalificacion(id: ID!): Boolean
   }
 `;

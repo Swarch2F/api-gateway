@@ -13,8 +13,20 @@ const subjectTypes = gql`
   }
 
   extend type Mutation {
+    # Crear nueva asignatura
     crearAsignatura(nombre: String!): Asignatura
+    
+    # Actualizar asignatura existente
+    actualizarAsignatura(id: ID!, nombre: String): Asignatura
+    
+    # Eliminar asignatura
+    eliminarAsignatura(id: ID!): Boolean
+    
+    # Asignar profesor a asignatura
     asignarProfesorAAsignatura(profesorId: ID!, asignaturaId: ID!): Asignatura
+    
+    # Desasignar profesor de asignatura
+    desasignarProfesorDeAsignatura(profesorId: ID!, asignaturaId: ID!): Asignatura
   }
 `;
 

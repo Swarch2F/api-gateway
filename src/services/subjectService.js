@@ -61,6 +61,41 @@ async function crearAsignatura({ nombre }) {
 }
 
 /**
+ * Invoca BEPROASIG → mutation { actualizarAsignatura(id:$id, nombre:$nombre) { id nombre profesorIds } }
+ * @param {object} input - El objeto con los datos de la asignatura a actualizar { id: string, nombre: string }
+ * @returns {Promise<Asignatura>} El objeto Asignatura { id, nombre, profesorIds } actualizado
+ */
+async function actualizarAsignatura({ id, nombre }) {
+  const mutation = `
+    mutation ($id: ID!, $nombre: String) {
+      actualizarAsignatura(id: $id, nombre: $nombre) {
+        id
+        nombre
+        profesorIds
+      }
+    }
+  `;
+  const variables = { id, nombre };
+  const data = await invokeBEPROASIG(mutation, variables);
+  return data.actualizarAsignatura;
+}
+
+/**
+ * Invoca BEPROASIG → mutation { eliminarAsignatura(id:$id) }
+ * @param {object} input - El objeto con el ID de la asignatura a eliminar { id: string }
+ * @returns {Promise<boolean>} True si la eliminación fue exitosa, false en caso contrario
+ */
+async function eliminarAsignatura({ id }) {
+  const mutation = `
+    mutation ($id: ID!) {
+      eliminarAsignatura(id: $id)
+    }
+  `;
+  const data = await invokeBEPROASIG(mutation, { id });
+  return data.eliminarAsignatura;
+}
+
+/**
  * Invoca BEPROASIG → mutation { asignarProfesorAAsignatura(profesorId:$profesorId, asignaturaId:$asignaturaId) { id nombre profesorIds } }
  * @param {object} input - El objeto con los datos del profesor y la asignatura a asignar { profesorId: string, asignaturaId: string }
  * @returns {Promise<Asignatura>} El objeto Asignatura { id, nombre, profesorIds } actualizado
@@ -79,10 +114,32 @@ async function asignarProfesorAAsignatura({ profesorId, asignaturaId }) {
   return data.asignarProfesorAAsignatura;
 }
 
+/**
+ * Invoca BEPROASIG → mutation { desasignarProfesorDeAsignatura(profesorId:$profesorId, asignaturaId:$asignaturaId) { id nombre profesorIds } }
+ * @param {object} input - El objeto con los datos del profesor y la asignatura a desasignar { profesorId: string, asignaturaId: string }
+ * @returns {Promise<Asignatura>} El objeto Asignatura { id, nombre, profesorIds } actualizado
+ */
+async function desasignarProfesorDeAsignatura({ profesorId, asignaturaId }) {
+  const mutation = `
+    mutation ($profesorId: ID!, $asignaturaId: ID!) {
+      desasignarProfesorDeAsignatura(profesorId: $profesorId, asignaturaId: $asignaturaId) {
+        id
+        nombre
+        profesorIds
+      }
+    }
+  `;
+  const data = await invokeBEPROASIG(mutation, { profesorId, asignaturaId });
+  return data.desasignarProfesorDeAsignatura;
+}
+
 module.exports = {
   getAsignaturas,
   getAsignaturaPorId,
   crearAsignatura,
+  actualizarAsignatura,
+  eliminarAsignatura,
   asignarProfesorAAsignatura,
+  desasignarProfesorDeAsignatura
 };
 
