@@ -29,7 +29,7 @@ services:
   # =============== MICROSERVICIO SIA COLEGIOS (Component-1) ===============
   component-1:
     build:
-      context: ../component-1-master
+      context: ../component-1
       dockerfile: Dockerfile
     image: component-1:latest
     container_name: component-1
@@ -70,7 +70,7 @@ services:
   # =============== MICROSERVICIO DE AUTENTICACIÓN (Component-4) ===============
   component-4:
     build:
-      context: ../component-4-main
+      context: ../component-4
       dockerfile: Dockerfile
     image: component-4:latest
     container_name: component-4
@@ -107,7 +107,7 @@ services:
   # =============== MICROSERVICIO PROFESORES Y ASIGNATURAS (Component-2-1) ===============
   component-2-1:
     build:
-      context: ../component-2-1-main
+      context: ../component-2-1
       dockerfile: Dockerfile
     image: component-2-1:latest
     container_name: component-2-1
@@ -137,7 +137,7 @@ services:
   # =============== MICROSERVICIO DE CALIFICACIONES (Component-2-2) ===============
   component-2-2:
     build:
-      context: ../component-2-2-main
+      context: ../component-2-2
       dockerfile: Dockerfile
     image: component-2-2:latest
     container_name: component-2-2

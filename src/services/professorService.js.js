@@ -69,6 +69,7 @@ async function crearProfesor({ nombre, documento, area }) {
       crearProfesor(nombre: $nombre, documento: $documento, area: $area) {
         id
         nombre
+        documento
         area
       }
     }
