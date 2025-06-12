@@ -12,7 +12,7 @@ services:
       - "9000:4000"
     environment:
       # URLs de los microservicios en la red de Docker
-      GX_BE_PROASIG_URL: "http://component-2-1:8080/graphql"
+      GX_BE_PROASIG_URL: "http://broker:3000/broker/graphql"
       GX_BE_CALIF_URL: "http://component-2-2:8080/graphql"
       GX_AUTH_URL: "http://component-4:8080/api/v1"
       GX_SIA_URL: "http://component-1:8000/api"
@@ -22,6 +22,47 @@ services:
       - component-2-1
       - component-2-2
       - component-4
+      - broker
+    restart: always
+    networks:
+      - microservices-network
+
+  # =============== BROKER ===============
+  broker:
+    build:
+      context: ../broker
+      dockerfile: Dockerfile
+    image: broker:latest
+    container_name: broker
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: always
+    networks:
+      - microservices-network
+
+  # =============== RABBITMQ ===============
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     restart: always
     networks:
       - microservices-network
@@ -170,6 +211,7 @@ volumes:
   mongo_professors_data:
   mongo_grades_data:
   sia_db_data:
+  rabbitmq_data:
 
 # Red para comunicación entre microservicios
 networks:
