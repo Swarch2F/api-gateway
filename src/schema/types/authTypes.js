@@ -8,8 +8,7 @@ const authTypes = gql`
   }
 
   type LoginResponse {
-    token: String!
-    message: String
+    message: String!
   }
 
   type RegisterResponse {
@@ -66,7 +65,20 @@ const authTypes = gql`
     
     # Vincular cuenta de Google a cuenta existente
     linkGoogleAccount(input: LinkGoogleAccountInput!): LinkAccountResponse!
+
+    # Cerrar sesión del usuario
+    logout: MessageResponse!
+  }
+  type AuthStatusResponse {
+    isAuthenticated: Boolean!
+    message: String!
+  }
+
+  # Extender Query existente
+  extend type Query {
+    # Verificar estado de autenticación
+    authStatus: AuthStatusResponse!
   }
 `;
 
-module.exports = authTypes; 
+module.exports = authTypes;

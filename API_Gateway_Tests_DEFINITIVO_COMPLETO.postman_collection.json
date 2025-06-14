@@ -44,8 +44,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -61,12 +65,16 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"query\": \"mutation { registerUser(input: { email: \\\"nuevo@example.com\\\", password: \\\"password123\\\" }) { message } }\"\n}"
+							"raw": "{\n  \"query\": \"mutation { registerUser(input: { email: \\\"nuevo@example.com\\\", password: \\\"password123\\\", name: \\\"Usuario Nuevo\\\", role: pROFEsoR }) { message } }\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -90,13 +98,17 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
 				{
-					"name": "URL Login Google",
+					"name": "Login con Google",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -107,12 +119,66 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"query\": \"query { getGoogleLoginUrl }\"\n}"
+							"raw": "{\n  \"query\": \"query { getGoogleLoginUrl { googleUrl message } }\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					}
+				},
+				{
+					"name": "Cerrar Sesión",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"mutation { logout { message } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					}
+				},
+				{
+					"name": "Auth status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { authStatus { isAuthenticated message } }\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/graphql",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				}
@@ -137,8 +203,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -158,8 +228,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -179,8 +253,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -217,8 +295,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -238,8 +320,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -259,8 +345,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -280,8 +370,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				}
@@ -306,8 +400,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -327,8 +425,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -348,8 +450,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -386,8 +492,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -407,8 +517,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -428,8 +542,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -449,8 +567,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -470,8 +592,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				}
@@ -496,8 +622,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -534,8 +664,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -555,8 +689,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -576,8 +714,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -597,8 +739,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -635,8 +781,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -656,8 +806,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -677,8 +831,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -698,8 +856,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				}
@@ -724,8 +886,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -762,8 +928,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -783,8 +953,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -804,8 +978,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -825,8 +1003,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				}
@@ -851,8 +1033,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				},
@@ -872,8 +1058,12 @@
 						},
 						"url": {
 							"raw": "{{base_url}}/graphql",
-							"host": ["{{base_url}}"],
-							"path": ["graphql"]
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"graphql"
+							]
 						}
 					}
 				}
@@ -917,4 +1107,4 @@
 			"type": "string"
 		}
 	]
-} 
+}
