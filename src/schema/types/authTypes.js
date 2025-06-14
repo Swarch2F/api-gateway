@@ -10,6 +10,10 @@ const authTypes = gql`
   type LoginResponse {
     message: String!
   }
+  
+  type LogoutResponse {
+    message: String!
+  }
 
   type RegisterResponse {
     message: String!
@@ -67,7 +71,7 @@ const authTypes = gql`
     linkGoogleAccount(input: LinkGoogleAccountInput!): LinkAccountResponse!
 
     # Cerrar sesión del usuario
-    logout: MessageResponse!
+    logout: LogoutResponse!
   }
   type AuthStatusResponse {
     isAuthenticated: Boolean!
