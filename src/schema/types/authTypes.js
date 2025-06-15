@@ -8,6 +8,7 @@ const authTypes = gql`
   }
 
   type LoginResponse {
+    token: String!
     message: String!
   }
   
