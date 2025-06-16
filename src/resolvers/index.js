@@ -1,21 +1,19 @@
-const authResolvers = require('./authResolvers');
-const graphqlResolvers = require('./graphql/resolvers');
-const siaResolvers = require('./rest/siaResolvers');
+const graphqlResolvers = require('./graphql');
+const restResolvers = require('./rest');
 
+// Combinar los resolvers de GraphQL y REST
 const resolvers = {
   Query: {
-    ...authResolvers.Query,
     ...graphqlResolvers.Query,
-    ...siaResolvers.Query
+    ...restResolvers.Query
   },
   Mutation: {
-    ...authResolvers.Mutation,
     ...graphqlResolvers.Mutation,
-    ...siaResolvers.Mutation
+    ...restResolvers.Mutation
   },
   // Resolvers de relaciones
-  Curso: siaResolvers.Curso,
-  Estudiante: siaResolvers.Estudiante
+  Curso: restResolvers.Curso,
+  Estudiante: restResolvers.Estudiante
 };
 
 module.exports = resolvers; 
