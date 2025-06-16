@@ -1,169 +1,60 @@
-
-
-// const fetch = require("node-fetch");
-// const { GX_AUTH_URL } = require("../configs/config");
-
-// /**
-//  * Helper para invocar endpoints REST del microservicio de autenticación
-//  * @param {string} endpoint - El endpoint REST a invocar
-//  * @param {string} method - Método HTTP (GET, POST, etc.)
-//  * @param {Object} body - Cuerpo de la petición (para POST/PUT)
-//  * @param {Object} headers - Headers adicionales
-//  * @returns {Promise<Object>} El resultado de la petición REST
-//  */
-// async function invokeAuthService(endpoint, method = 'GET', body = null, headers = {}) {
-//   const url = `${GX_AUTH_URL}${endpoint}`;
-//   const options = {
-//     method,
-//     headers: {
-//       'Content-Type': 'application/json',
-//       ...headers
-//     }
-//   };
-
-//   if (body && (method === 'POST' || method === 'PUT')) {
-//     options.body = JSON.stringify(body);
-//   }
-
-//   try {
-//     const response = await fetch(url, options);
-//     const data = await response.json();
-    
-//     if (!response.ok) {
-//       throw new Error(`Auth Service Error (${response.status}): ${data.error || data.message || 'Unknown error'}`);
-//     }
-    
-//     return data;
-//   } catch (error) {
-//     throw new Error(`Auth Service Connection Error: ${error.message}`);
-//   }
-// }
-
-// // —————— OPERACIONES DE AUTENTICACIÓN ——————
-
-// /**
-//  * Registra un nuevo usuario con email y contraseña
-//  * @param {Object} userData - { email: string, password: string }
-//  * @returns {Promise<Object>} Resultado del registro
-//  */
-// async function registerUser({ email, password }) {
-//   return await invokeAuthService('/register', 'POST', { email, password });
-// }
-
-// /**
-//  * Inicia sesión con email y contraseña
-//  * @param {Object} loginData - { email: string, password: string }
-//  * @returns {Promise<Object>} Resultado del login con token
-//  */
-// async function loginUser({ email, password }) {
-//   return await invokeAuthService('/login', 'POST', { email, password });
-// }
-
-// /**
-//  * Obtiene la URL de redirección para login con Google
-//  * @returns {Promise<Object>} URL de redirección a Google OAuth
-//  */
-// async function getGoogleLoginUrl() {
-//   // Para Google OAuth, necesitamos devolver la URL del servicio
-//   return {
-//     googleUrl: `${GX_AUTH_URL}/auth/google/login`,
-//     message: "Redirige al usuario a esta URL para autenticación con Google"
-//   };
-// }
-
-// /**
-//  * Vincula una cuenta de Google a una cuenta existente
-//  * @param {Object} linkData - { email: string, password: string, google_auth_code: string }
-//  * @returns {Promise<Object>} Resultado de la vinculación
-//  */
-// async function linkGoogleAccount({ email, password, googleAuthCode }) {
-//   return await invokeAuthService('/auth/google/link', 'POST', {
-//     email,
-//     password,
-//     google_auth_code: googleAuthCode
-//   });
-// }
-
-// /**
-//  * Obtiene el perfil del usuario autenticado
-//  * @param {string} token - Token JWT del usuario
-//  * @returns {Promise<Object>} Perfil del usuario
-//  */
-// async function getUserProfile(token) {
-//   return await invokeAuthService('/profile', 'GET', null, {
-//     'Authorization': `Bearer ${token}`
-//   });
-// }
-
-// /**
-//  * Valida un token JWT
-//  * @param {string} token - Token JWT a validar
-//  * @returns {Promise<Object>} Información del token validado
-//  */
-// async function validateToken(token) {
-//   try {
-//     const profile = await getUserProfile(token);
-//     return { valid: true, user: profile };
-//   } catch (error) {
-//     return { valid: false, error: error.message };
-//   }
-// }
-
-// module.exports = {
-//   registerUser,
-//   loginUser,
-//   getGoogleLoginUrl,
-//   linkGoogleAccount,
-//   getUserProfile,
-//   validateToken
-// }; 
-
-const { invokeBECALIF } = require('./baseService');
+const { invokeAuthService } = require('./baseService');
 
 // —————— OPERACIONES DE AUTENTICACIÓN ——————
 
 /**
  * Registra un nuevo usuario con email y contraseña
- * @param {Object} userData - { email: string, password: string }
+ * @param {Object} userData - { email: string, password: string, name: string, role: string }
  * @returns {Promise<Object>} Resultado del registro
  */
-async function registerUser({ email, password }) {
-  const mutation = `
-    mutation ($email: String!, $password: String!) {
-      registerUser(email: $email, password: $password) {
-        id
-        email
-        createdAt
-      }
-    }
-  `;
-  
-  const variables = { email, password };
-  const data = await invokeBECALIF(mutation, variables);
-  return data.registerUser;
+async function registerUser(userData) {
+  console.log('🔑 [authService] Iniciando registro para:', userData.email);
+  try {
+    const response = await invokeAuthService('/register', 'POST', userData);
+    console.log('📦 [authService] Respuesta del registro:', response);
+    return {
+      message: 'Usuario registrado exitosamente',
+      user: response.data
+    };
+  } catch (error) {
+    console.error('❌ [authService] Error en registro:', error);
+    throw error;
+  }
 }
 
 /**
  * Inicia sesión con email y contraseña
- * @param {Object} loginData - { email: string, password: string }
- * @returns {Promise<Object>} Resultado del login con token
+ * @param {string} email - Email del usuario
+ * @param {string} password - Contraseña del usuario
+ * @returns {Promise<{data: Object, headers: Object}>} Resultado del login y headers
  */
-async function loginUser({ email, password }) {
-  const mutation = `
-    mutation ($email: String!, $password: String!) {
-      loginUser(email: $email, password: $password) {
-        token
-        user {
-          id
-          email
-        }
-      }
+async function loginUser(credentials) {
+  console.log('🔑 [authService] Iniciando login para:', credentials.email);
+  try {
+    const response = await invokeAuthService('/login', 'POST', {
+      email: credentials.email,
+      password: credentials.password
+    });
+    console.log('📦 [authService] Respuesta del servicio de autenticación:', response);
+    
+    // Verificar que tenemos una respuesta válida
+    if (!response || !response.headers) {
+      throw new Error('Respuesta inválida del servicio de autenticación');
     }
-  `;
-  
-  const variables = { email, password };
-  const data = await invokeBECALIF(mutation, variables);
-  return data.loginUser;
+
+    const token = response.headers.get('authorization');
+    if (!token) {
+      throw new Error('No se recibió el token de autenticación');
+    }
+
+    return {
+      message: 'Inicio de sesión exitoso',
+      token: token.replace('Bearer ', '')
+    };
+  } catch (error) {
+    console.error('❌ [authService] Error en login:', error);
+    throw new Error(error.message || 'Error en el inicio de sesión');
+  }
 }
 
 /**
@@ -171,11 +62,10 @@ async function loginUser({ email, password }) {
  * @returns {Promise<Object>} URL de redirección a Google OAuth
  */
 async function getGoogleLoginUrl() {
-  const query = `query { googleLoginUrl }`;
-  const data = await invokeBECALIF(query);
+  const response = await invokeAuthService('/auth/google/login', 'GET');
   return {
-    googleUrl: data.googleLoginUrl,
-    message: "Redirige al usuario a esta URL para autenticación con Google"
+    googleUrl: 'http://localhost:8082/api/v1/auth/google/login',
+    message: 'URL de login con Google obtenida exitosamente'
   };
 }
 
@@ -185,66 +75,66 @@ async function getGoogleLoginUrl() {
  * @returns {Promise<Object>} Resultado de la vinculación
  */
 async function linkGoogleAccount({ email, password, googleAuthCode }) {
-  const mutation = `
-    mutation (
-      $email: String!,
-      $password: String!,
-      $googleAuthCode: String!
-    ) {
-      linkGoogleAccount(
-        email: $email,
-        password: $password,
-        googleAuthCode: $googleAuthCode
-      ) {
-        success
-        message
-        user {
-          id
-          email
-          isGoogleLinked
-        }
-      }
-    }
-  `;
-  
-  const variables = { email, password, googleAuthCode };
-  const data = await invokeBECALIF(mutation, variables);
-  return data.linkGoogleAccount;
-}
-
-/**
- * Obtiene el perfil del usuario autenticado
- * @param {string} token - Token JWT del usuario
- * @returns {Promise<Object>} Perfil del usuario
- */
-async function getUserProfile(token) {
-  const query = `query { 
-    userProfile {
-      id
-      email
-      isGoogleLinked
-      createdAt
-      updatedAt
-    }
-  }`;
-  
-  const data = await invokeBECALIF(query, null, {
-    'Authorization': `Bearer ${token}`
+  return await invokeAuthService('/auth/google/link', 'POST', {
+    email,
+    password,
+    google_auth_code: googleAuthCode
   });
-  return data.userProfile;
 }
 
 /**
- * Valida un token JWT
- * @param {string} token - Token JWT a validar
- * @returns {Promise<Object>} Información del token validado
+ * Obtiene el estado de autenticación del usuario
+ * @param {string} authHeader - Header de autorización (Bearer token)
+ * @returns {Promise<Object>} Estado de autenticación
  */
-async function validateToken(token) {
+async function getAuthStatus(authHeader) {
+  console.log('🔑 [authService] Verificando estado de autenticación');
   try {
-    const profile = await getUserProfile(token);
-    return { valid: true, user: profile };
+    const response = await invokeAuthService('/auth-status', 'GET', null, {
+      'Authorization': authHeader
+    });
+    console.log('📦 [authService] Respuesta del estado de autenticación:', response);
+    return response.data;
   } catch (error) {
-    return { valid: false, error: error.message };
+    console.error('❌ [authService] Error al verificar estado:', error);
+    return {
+      user: { id: '', name: 'Anónimo', email: '', role: 'guest' },
+      isAuthenticated: false
+    };
+  }
+}
+
+/**
+ * Cierra la sesión del usuario
+ * @returns {Promise<Object>} Resultado del logout
+ */
+async function logout() {
+  return await invokeAuthService('/logout', 'POST');
+}
+
+async function handleGoogleCallback(code) {
+  console.log('🔑 [authService] Procesando callback de Google');
+  try {
+    const response = await invokeAuthService(`/auth/google/callback?code=${code}`, 'GET');
+    console.log('📦 [authService] Respuesta del callback de Google:', response);
+    
+    // Verificar que tenemos una respuesta válida
+    if (!response || !response.headers) {
+      throw new Error('Respuesta inválida del servicio de autenticación');
+    }
+
+    const token = response.headers.get('authorization');
+    if (!token) {
+      throw new Error('No se recibió el token de autenticación');
+    }
+
+    return {
+      message: 'Inicio de sesión exitoso con Google',
+      token: token.replace('Bearer ', '')
+    };
+  } catch (error) {
+    console.error('❌ [authService] Error en callback de Google:', error);
+    throw new Error(error.message || 'Error en el inicio de sesión con Google');
   }
 }
 
@@ -253,6 +143,7 @@ module.exports = {
   loginUser,
   getGoogleLoginUrl,
   linkGoogleAccount,
-  getUserProfile,
-  validateToken
+  getAuthStatus,
+  logout,
+  handleGoogleCallback
 };
