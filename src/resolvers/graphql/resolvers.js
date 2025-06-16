@@ -14,7 +14,6 @@ const {
   crearProfesor,
   actualizarProfesor,
   eliminarProfesor,
-
 } = require('../../services/professorService.js.js');
 
 const {
@@ -35,13 +34,7 @@ const {
   eliminarCalificacion
 } = require('../../services/gradesService.js');
 
-const {
-  registerUser,
-  loginUser,
-  getGoogleLoginUrl,
-  linkGoogleAccount,
-  getUserProfile
-} = require('../../services/authService.js');
+const authService = require('../../services/authService.js');
 
 // Importar resolvers de SIA Colegios
 const siaResolvers = require('../rest/siaResolvers');
@@ -78,16 +71,16 @@ const resolvers = {
      */
     holaMundo2: async () => getHolaMundoFromBECALIF(),
     /**
-     * Devuelve un array de objetos Calificaci n
+     * Devuelve un array de objetos Calificación
      * @param {Object} args - Los argumentos para filtrar las calificaciones
      */
     calificaciones: async (_, args) => getCalificaciones(args),
 
-    // —————— NUEVOS RESOLVERS DE AUTENTICACIÓN ——————
+    // —————— RESOLVERS DE AUTENTICACIÓN ——————
     /**
      * Obtiene la URL para login con Google
      */
-    getGoogleLoginUrl: async () => getGoogleLoginUrl(),
+    getGoogleLoginUrl: async () => authService.getGoogleLoginUrl(),
     
     /**
      * Obtiene el perfil del usuario autenticado
@@ -101,10 +94,18 @@ const resolvers = {
         throw new Error('Token de autorización requerido. Formato: Bearer <token>');
       }
       const token = authHeader.substring(7);
-      return getUserProfile(token);
+      return authService.getUserProfile(token);
     },
 
-    // —————— NUEVOS RESOLVERS DE SIA COLEGIOS ——————
+    /**
+     * Verifica el estado de autenticación del usuario
+     */
+    authStatus: async (_, __, { req }) => {
+      const token = req.headers.authorization?.split(' ')[1];
+      return authService.checkAuthStatus(token);
+    },
+
+    // —————— RESOLVERS DE SIA COLEGIOS ——————
     // Queries de Cursos
     cursos: siaResolvers.Query.cursos,
     curso: siaResolvers.Query.curso,
@@ -221,19 +222,21 @@ const resolvers = {
      * Registra un nuevo usuario
      * @param {Object} input - { email: string, password: string }
      */
-    registerUser: async (_, { input }) => registerUser(input),
+    registerUser: async (_, { input }) => authService.registerUser(input),
     
     /**
      * Inicia sesión de usuario
      * @param {Object} input - { email: string, password: string }
      */
-    loginUser: async (_, { input }) => loginUser(input),
+    loginUser: async (_, { input }) => authService.loginUser(input),
     
     /**
-     * Vincula cuenta de Google a cuenta existente
-     * @param {Object} input - { email: string, password: string, googleAuthCode: string }
+     * Cierra sesión del usuario
      */
-    linkGoogleAccount: async (_, { input }) => linkGoogleAccount(input),
+    logout: async (_, __, { req }) => {
+      const token = req.headers.authorization?.split(' ')[1];
+      return authService.logoutUser(token);
+    },
 
     // —————— NUEVAS MUTATIONS DE SIA COLEGIOS ——————
     // Mutations de Cursos

@@ -1,258 +1,89 @@
+const fetch = require('node-fetch');
+const config = require('../configs/config');
 
+class AuthService {
+  constructor() {
+    this.baseURL = config.GX_AUTH_URL;
+    this.JWT_COOKIE_NAME = 'jwt_token';
+  }
 
-// const fetch = require("node-fetch");
-// const { GX_AUTH_URL } = require("../configs/config");
-
-// /**
-//  * Helper para invocar endpoints REST del microservicio de autenticación
-//  * @param {string} endpoint - El endpoint REST a invocar
-//  * @param {string} method - Método HTTP (GET, POST, etc.)
-//  * @param {Object} body - Cuerpo de la petición (para POST/PUT)
-//  * @param {Object} headers - Headers adicionales
-//  * @returns {Promise<Object>} El resultado de la petición REST
-//  */
-// async function invokeAuthService(endpoint, method = 'GET', body = null, headers = {}) {
-//   const url = `${GX_AUTH_URL}${endpoint}`;
-//   const options = {
-//     method,
-//     headers: {
-//       'Content-Type': 'application/json',
-//       ...headers
-//     }
-//   };
-
-//   if (body && (method === 'POST' || method === 'PUT')) {
-//     options.body = JSON.stringify(body);
-//   }
-
-//   try {
-//     const response = await fetch(url, options);
-//     const data = await response.json();
-    
-//     if (!response.ok) {
-//       throw new Error(`Auth Service Error (${response.status}): ${data.error || data.message || 'Unknown error'}`);
-//     }
-    
-//     return data;
-//   } catch (error) {
-//     throw new Error(`Auth Service Connection Error: ${error.message}`);
-//   }
-// }
-
-// // —————— OPERACIONES DE AUTENTICACIÓN ——————
-
-// /**
-//  * Registra un nuevo usuario con email y contraseña
-//  * @param {Object} userData - { email: string, password: string }
-//  * @returns {Promise<Object>} Resultado del registro
-//  */
-// async function registerUser({ email, password }) {
-//   return await invokeAuthService('/register', 'POST', { email, password });
-// }
-
-// /**
-//  * Inicia sesión con email y contraseña
-//  * @param {Object} loginData - { email: string, password: string }
-//  * @returns {Promise<Object>} Resultado del login con token
-//  */
-// async function loginUser({ email, password }) {
-//   return await invokeAuthService('/login', 'POST', { email, password });
-// }
-
-// /**
-//  * Obtiene la URL de redirección para login con Google
-//  * @returns {Promise<Object>} URL de redirección a Google OAuth
-//  */
-// async function getGoogleLoginUrl() {
-//   // Para Google OAuth, necesitamos devolver la URL del servicio
-//   return {
-//     googleUrl: `${GX_AUTH_URL}/auth/google/login`,
-//     message: "Redirige al usuario a esta URL para autenticación con Google"
-//   };
-// }
-
-// /**
-//  * Vincula una cuenta de Google a una cuenta existente
-//  * @param {Object} linkData - { email: string, password: string, google_auth_code: string }
-//  * @returns {Promise<Object>} Resultado de la vinculación
-//  */
-// async function linkGoogleAccount({ email, password, googleAuthCode }) {
-//   return await invokeAuthService('/auth/google/link', 'POST', {
-//     email,
-//     password,
-//     google_auth_code: googleAuthCode
-//   });
-// }
-
-// /**
-//  * Obtiene el perfil del usuario autenticado
-//  * @param {string} token - Token JWT del usuario
-//  * @returns {Promise<Object>} Perfil del usuario
-//  */
-// async function getUserProfile(token) {
-//   return await invokeAuthService('/profile', 'GET', null, {
-//     'Authorization': `Bearer ${token}`
-//   });
-// }
-
-// /**
-//  * Valida un token JWT
-//  * @param {string} token - Token JWT a validar
-//  * @returns {Promise<Object>} Información del token validado
-//  */
-// async function validateToken(token) {
-//   try {
-//     const profile = await getUserProfile(token);
-//     return { valid: true, user: profile };
-//   } catch (error) {
-//     return { valid: false, error: error.message };
-//   }
-// }
-
-// module.exports = {
-//   registerUser,
-//   loginUser,
-//   getGoogleLoginUrl,
-//   linkGoogleAccount,
-//   getUserProfile,
-//   validateToken
-// }; 
-
-const { invokeBECALIF } = require('./baseService');
-
-// —————— OPERACIONES DE AUTENTICACIÓN ——————
-
-/**
- * Registra un nuevo usuario con email y contraseña
- * @param {Object} userData - { email: string, password: string }
- * @returns {Promise<Object>} Resultado del registro
- */
-async function registerUser({ email, password }) {
-  const mutation = `
-    mutation ($email: String!, $password: String!) {
-      registerUser(email: $email, password: $password) {
-        id
-        email
-        createdAt
+  async invokeAuthEndpoint(endpoint, method = 'GET', data = null, token = null, followRedirects = false) {
+    try {
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
-    }
-  `;
-  
-  const variables = { email, password };
-  const data = await invokeBECALIF(mutation, variables);
-  return data.registerUser;
-}
 
-/**
- * Inicia sesión con email y contraseña
- * @param {Object} loginData - { email: string, password: string }
- * @returns {Promise<Object>} Resultado del login con token
- */
-async function loginUser({ email, password }) {
-  const mutation = `
-    mutation ($email: String!, $password: String!) {
-      loginUser(email: $email, password: $password) {
-        token
-        user {
-          id
-          email
-        }
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
+        method,
+        headers,
+        body: data ? JSON.stringify(data) : undefined,
+        credentials: 'include',
+        redirect: followRedirects ? 'follow' : 'manual'
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(responseData.error || responseData.message || 'Error en el servicio de autenticación');
       }
+
+      return responseData;
+    } catch (error) {
+      throw new Error(error.message || 'Error en el servicio de autenticación');
     }
-  `;
-  
-  const variables = { email, password };
-  const data = await invokeBECALIF(mutation, variables);
-  return data.loginUser;
-}
+  }
 
-/**
- * Obtiene la URL de redirección para login con Google
- * @returns {Promise<Object>} URL de redirección a Google OAuth
- */
-async function getGoogleLoginUrl() {
-  const query = `query { googleLoginUrl }`;
-  const data = await invokeBECALIF(query);
-  return {
-    googleUrl: data.googleLoginUrl,
-    message: "Redirige al usuario a esta URL para autenticación con Google"
-  };
-}
+  async registerUser(userData) {
+    return this.invokeAuthEndpoint('/register', 'POST', userData);
+  }
 
-/**
- * Vincula una cuenta de Google a una cuenta existente
- * @param {Object} linkData - { email: string, password: string, googleAuthCode: string }
- * @returns {Promise<Object>} Resultado de la vinculación
- */
-async function linkGoogleAccount({ email, password, googleAuthCode }) {
-  const mutation = `
-    mutation (
-      $email: String!,
-      $password: String!,
-      $googleAuthCode: String!
-    ) {
-      linkGoogleAccount(
-        email: $email,
-        password: $password,
-        googleAuthCode: $googleAuthCode
-      ) {
-        success
-        message
-        user {
-          id
-          email
-          isGoogleLinked
-        }
+  async loginUser(credentials) {
+    return this.invokeAuthEndpoint('/login', 'POST', credentials);
+  }
+
+  async getGoogleLoginUrl() {
+    return this.invokeAuthEndpoint('/google-login', 'GET', null, null, true);
+  }
+
+  async checkAuthStatus(token = null) {
+    try {
+      if (!token) {
+        return {
+          user: {
+            id: "",
+            name: "Anónimo",
+            email: "",
+            role: "guest"
+          },
+          isAuthenticated: false
+        };
       }
-    }
-  `;
-  
-  const variables = { email, password, googleAuthCode };
-  const data = await invokeBECALIF(mutation, variables);
-  return data.linkGoogleAccount;
-}
 
-/**
- * Obtiene el perfil del usuario autenticado
- * @param {string} token - Token JWT del usuario
- * @returns {Promise<Object>} Perfil del usuario
- */
-async function getUserProfile(token) {
-  const query = `query { 
-    userProfile {
-      id
-      email
-      isGoogleLinked
-      createdAt
-      updatedAt
+      const response = await this.invokeAuthEndpoint('/auth-status', 'GET', null, token);
+      return {
+        user: response.user,
+        isAuthenticated: response.isAuthenticated
+      };
+    } catch (error) {
+      return {
+        user: {
+          id: "",
+          name: "Anónimo",
+          email: "",
+          role: "guest"
+        },
+        isAuthenticated: false
+      };
     }
-  }`;
-  
-  const data = await invokeBECALIF(query, null, {
-    'Authorization': `Bearer ${token}`
-  });
-  return data.userProfile;
-}
+  }
 
-/**
- * Valida un token JWT
- * @param {string} token - Token JWT a validar
- * @returns {Promise<Object>} Información del token validado
- */
-async function validateToken(token) {
-  try {
-    const profile = await getUserProfile(token);
-    return { valid: true, user: profile };
-  } catch (error) {
-    return { valid: false, error: error.message };
+  async logoutUser(token = null) {
+    return this.invokeAuthEndpoint('/logout', 'POST', null, token);
   }
 }
 
-module.exports = {
-  registerUser,
-  loginUser,
-  getGoogleLoginUrl,
-  linkGoogleAccount,
-  getUserProfile,
-  validateToken
-};
+module.exports = new AuthService();

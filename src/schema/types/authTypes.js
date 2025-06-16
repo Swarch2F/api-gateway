@@ -4,7 +4,14 @@ const authTypes = gql`
   # Tipos de datos para autenticación
   type User {
     id: ID!
+    name: String!
     email: String!
+    role: String!
+  }
+
+  type AuthStatusResponse {
+    user: User!
+    isAuthenticated: Boolean!
   }
 
   type LoginResponse {
@@ -17,7 +24,8 @@ const authTypes = gql`
   }
 
   type RegisterResponse {
-    message: String!
+    message: String
+    error: String
   }
 
   type GoogleLoginResponse {
@@ -38,6 +46,8 @@ const authTypes = gql`
   input RegisterInput {
     email: String!
     password: String!
+    name: String!
+    role: String!
   }
 
   input LoginInput {
@@ -58,6 +68,9 @@ const authTypes = gql`
     
     # Obtener perfil del usuario autenticado (requiere token en headers)
     userProfile: UserProfile!
+    
+    # Verificar estado de autenticación
+    authStatus: AuthStatusResponse!
   }
 
   # Extender Mutation existente
@@ -73,16 +86,6 @@ const authTypes = gql`
 
     # Cerrar sesión del usuario
     logout: LogoutResponse!
-  }
-  type AuthStatusResponse {
-    isAuthenticated: Boolean!
-    message: String!
-  }
-
-  # Extender Query existente
-  extend type Query {
-    # Verificar estado de autenticación
-    authStatus: AuthStatusResponse!
   }
 `;
 
