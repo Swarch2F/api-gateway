@@ -7,11 +7,13 @@ const authTypes = gql`
     name: String!
     email: String!
     role: String!
+<<<<<<< HEAD
   }
 
   type LoginResponse {
     token: String!
     message: String!
+    token: String
     token: String
   }
   
@@ -34,10 +36,18 @@ const authTypes = gql`
     token: String
   }
 
+  type GoogleCallbackResponse {
+    message: String!
+    token: String
+  }
+
   type LinkAccountResponse {
     message: String!
   }
 
+  type AuthStatusResponse {
+    user: User!
+    isAuthenticated: Boolean!
   type AuthStatusResponse {
     user: User!
     isAuthenticated: Boolean!
@@ -66,11 +76,17 @@ const authTypes = gql`
     code: String!
   }
 
+  input GoogleCallbackInput {
+    code: String!
+  }
+
   # Extender Query existente
   extend type Query {
     # Obtener URL para login con Google
     getGoogleLoginUrl: GoogleLoginResponse!
     
+=======
+>>>>>>> temp-auth
     # Verificar estado de autenticación
     authStatus: AuthStatusResponse!
   }
@@ -82,6 +98,9 @@ const authTypes = gql`
     
     # Login de usuario nativo
     loginUser(input: LoginInput!): LoginResponse!
+    
+    # Callback de Google OAuth
+    handleGoogleCallback(input: GoogleCallbackInput!): GoogleCallbackResponse!
     
     # Callback de Google OAuth
     handleGoogleCallback(input: GoogleCallbackInput!): GoogleCallbackResponse!
