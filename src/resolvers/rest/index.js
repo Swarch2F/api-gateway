@@ -1,11 +1,13 @@
-
+const authResolver = require('./authResolver');
 const siaResolvers = require('./siaResolvers');
 
 const restResolvers = {
   Query: {
+    ...authResolver.Query,
     ...siaResolvers.Query
   },
   Mutation: {
+    ...authResolver.Mutation,
     ...siaResolvers.Mutation
   },
   // Resolvers de relaciones
