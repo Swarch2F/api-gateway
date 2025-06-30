@@ -3,5 +3,6 @@ module.exports = {
   GX_BE_CALIF_URL: process.env.GX_BE_CALIF_URL || 'http://localhost:8081/graphql',
   GX_AUTH_URL: process.env.GX_AUTH_URL || 'http://localhost:8082/api/v1',
   GX_SIA_URL: process.env.GX_SIA_URL || 'http://localhost:8000/api/v1',
+  RABBITMQ_URL: process.env.RABBITMQ_URL || 'amqp://rabbitmq:5672',
   PORT: process.env.PORT || 4000
 };

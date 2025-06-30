@@ -1,15 +1,57 @@
 const fetch = require("node-fetch");
 const { GX_BE_PROASIG_URL, GX_BE_CALIF_URL, GX_AUTH_URL } = require("../configs/config");
-// const axios = require("axios");
+const RabbitMQService = require('./rabbitMQService');
+
+// Instancia global del servicio RabbitMQ
+let rabbitMQService = null;
+
+// Inicializar RabbitMQ
+async function initializeRabbitMQ() {
+    if (!rabbitMQService) {
+        rabbitMQService = new RabbitMQService();
+        try {
+            await rabbitMQService.connect();
+            console.log('🎯 [baseService] RabbitMQ inicializado correctamente');
+        } catch (error) {
+            console.error('❌ [baseService] Error inicializando RabbitMQ:', error);
+            rabbitMQService = null;
+        }
+    }
+    return rabbitMQService;
+}
 
 
 /**
- * Helper para invocar cualquier query o mutation a MS1
+ * Helper para invocar cualquier query o mutation a MS1 con RabbitMQ
  * @param {string} queryBody - El cuerpo de la consulta GraphQL a enviar a MS1
  * @param {Object} variables - Los variables a pasarle a la consulta GraphQL
+ * @param {boolean} useAsync - Si usar RabbitMQ (true) o llamada directa (false)
  * @returns {Promise<Object>} El resultado de la consulta GraphQL en formato JSON
  */
-async function invokeBEPROASIG(queryBody, variables = {}) {
+async function invokeBEPROASIG(queryBody, variables = {}, useAsync = true) {
+  console.log(`🎯 [baseService] invokeBEPROASIG llamado con useAsync=${useAsync}`);
+  
+  // Intentar usar RabbitMQ si está disponible y useAsync es true
+  if (useAsync) {
+    try {
+      const rabbitmq = await initializeRabbitMQ();
+      if (rabbitmq) {
+        console.log('� [baseService] ✅ Enviando consulta a través de RabbitMQ');
+        const result = await rabbitmq.sendGraphQLQuery(queryBody, variables);
+        console.log('🐰 [baseService] ✅ Respuesta recibida de RabbitMQ');
+        return result;
+      } else {
+        console.warn('⚠️ [baseService] RabbitMQ no inicializado, usando llamada directa');
+      }
+    } catch (error) {
+      console.warn('⚠️ [baseService] RabbitMQ falló, usando llamada directa:', error.message);
+    }
+  } else {
+    console.log('🔄 [baseService] useAsync=false, usando llamada directa');
+  }
+
+  // Fallback a llamada directa
+  console.log('� [baseService] 🔄 Usando llamada HTTP directa a MS1');
   const response = await fetch(GX_BE_PROASIG_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -22,6 +64,7 @@ async function invokeBEPROASIG(queryBody, variables = {}) {
   if (errors) {
     throw new Error(`MS1 Error: ${JSON.stringify(errors)}`);
   }
+  console.log('📡 [baseService] ✅ Respuesta HTTP directa recibida');
   return data;
 }
 
@@ -121,8 +164,26 @@ async function invokeAuthService(endpoint, method = 'GET', data = null, headers 
     }
 }
 
+/**
+ * Helper que FUERZA el uso de RabbitMQ (sin fallback)
+ * @param {string} queryBody - El cuerpo de la consulta GraphQL
+ * @param {Object} variables - Variables de la consulta
+ * @returns {Promise<Object>} El resultado de la consulta GraphQL
+ */
+async function invokeBEPROASIGAsync(queryBody, variables = {}) {
+  const rabbitmq = await initializeRabbitMQ();
+  if (!rabbitmq) {
+    throw new Error('RabbitMQ no está disponible y se requiere para esta operación');
+  }
+  console.log('🐰 [baseService] 🚀 FORZANDO uso de RabbitMQ');
+  return await rabbitmq.sendGraphQLQuery(queryBody, variables);
+}
+
 module.exports = {
   invokeBEPROASIG,
+  invokeBEPROASIGAsync,
   invokeBECALIF,
-  invokeAuthService
+  invokeAuthService,
+  initializeRabbitMQ,
+  getRabbitMQStatus: () => rabbitMQService ? rabbitMQService.getHealthStatus() : { status: 'not_initialized' }
 };

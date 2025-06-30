@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Iniciando todos los microservicios..."
+echo "🚀 Iniciando todos los microservicios con RabbitMQ integrado..."
 echo ""
 
 # Verificar que Docker esté corriendo
@@ -14,10 +14,14 @@ docker-compose up --build -d
 
 echo ""
 echo "⏳ Esperando que los servicios estén listos..."
-sleep 10
+sleep 15
 
 echo ""
-echo "✅ Servicios desplegados correctamente!"
+echo "🔍 Verificando estado de RabbitMQ..."
+curl -s http://localhost:9000/health | jq '.services.rabbitmq' || echo "Health check no disponible aún"
+
+echo ""
+echo "✅ Servicios desplegados correctamente con RabbitMQ!"
 echo ""
 echo "🌐 ENDPOINTS DISPONIBLES:"
 echo "=================================="
