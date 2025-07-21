@@ -18,7 +18,7 @@ const authResolvers = {
     authStatus: async (_, __, { req }) => {
       try {
         const token = getTokenFromHeaders(req);
-        return await authService.checkAuthStatus(token);
+        return await authService.getAuthStatus(token);
       } catch (error) {
         console.error('Error en authStatus:', error);
         throw new AuthenticationError(error.message);
@@ -54,7 +54,8 @@ const authResolvers = {
       try {
         const result = await authService.loginUser(input);
         return {
-          message: result.message
+          message: result.message,
+          token: result.token
         };
       } catch (error) {
         throw new AuthenticationError(error.message);
