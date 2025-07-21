@@ -97,9 +97,20 @@ const siaResolvers = {
           nombre: input.nombre,
           codigo: input.codigo
         };
-        return await siaService.createCurso(cursoData);
+        const curso = await siaService.createCurso(cursoData);
+        return {
+          success: true,
+          message: "Curso creado exitosamente",
+          curso: curso,
+          errors: []
+        };
       } catch (error) {
-        throw new Error(`Error al crear curso: ${error.message}`);
+        return {
+          success: false,
+          message: `Error al crear curso: ${error.message}`,
+          curso: null,
+          errors: [error.message]
+        };
       }
     },
 
@@ -112,9 +123,20 @@ const siaResolvers = {
           nombre: input.nombre,
           codigo: input.codigo
         };
-        return await siaService.updateCurso(id, cursoData);
+        const curso = await siaService.updateCurso(id, cursoData);
+        return {
+          success: true,
+          message: "Curso actualizado exitosamente",
+          curso: curso,
+          errors: []
+        };
       } catch (error) {
-        throw new Error(`Error al actualizar curso: ${error.message}`);
+        return {
+          success: false,
+          message: `Error al actualizar curso: ${error.message}`,
+          curso: null,
+          errors: [error.message]
+        };
       }
     },
 
@@ -127,9 +149,20 @@ const siaResolvers = {
         if (nombre !== undefined) cursoData.nombre = nombre;
         if (codigo !== undefined) cursoData.codigo = codigo;
         
-        return await siaService.updateCursoParcial(id, cursoData);
+        const curso = await siaService.updateCursoParcial(id, cursoData);
+        return {
+          success: true,
+          message: "Curso actualizado exitosamente",
+          curso: curso,
+          errors: []
+        };
       } catch (error) {
-        throw new Error(`Error al actualizar curso parcialmente: ${error.message}`);
+        return {
+          success: false,
+          message: `Error al actualizar curso parcialmente: ${error.message}`,
+          curso: null,
+          errors: [error.message]
+        };
       }
     },
 
@@ -139,9 +172,19 @@ const siaResolvers = {
     eliminarCurso: async (_, { id }) => {
       try {
         const result = await siaService.deleteCurso(id);
-        return result.success || true;
+        return {
+          success: true,
+          message: "Curso eliminado exitosamente",
+          curso: null,
+          errors: []
+        };
       } catch (error) {
-        throw new Error(`Error al eliminar curso: ${error.message}`);
+        return {
+          success: false,
+          message: `Error al eliminar curso: ${error.message}`,
+          curso: null,
+          errors: [error.message]
+        };
       }
     },
 
@@ -159,9 +202,20 @@ const siaResolvers = {
           acudiente: input.acudiente,
           curso: input.curso
         };
-        return await siaService.createEstudiante(estudianteData);
+        const estudiante = await siaService.createEstudiante(estudianteData);
+        return {
+          success: true,
+          message: "Estudiante creado exitosamente",
+          estudiante: estudiante,
+          errors: []
+        };
       } catch (error) {
-        throw new Error(`Error al crear estudiante: ${error.message}`);
+        return {
+          success: false,
+          message: `Error al crear estudiante: ${error.message}`,
+          estudiante: null,
+          errors: [error.message]
+        };
       }
     },
 
@@ -177,9 +231,20 @@ const siaResolvers = {
           acudiente: input.acudiente,
           curso: input.curso
         };
-        return await siaService.updateEstudiante(id, estudianteData);
+        const estudiante = await siaService.updateEstudiante(id, estudianteData);
+        return {
+          success: true,
+          message: "Estudiante actualizado exitosamente",
+          estudiante: estudiante,
+          errors: []
+        };
       } catch (error) {
-        throw new Error(`Error al actualizar estudiante: ${error.message}`);
+        return {
+          success: false,
+          message: `Error al actualizar estudiante: ${error.message}`,
+          estudiante: null,
+          errors: [error.message]
+        };
       }
     },
 
@@ -195,9 +260,20 @@ const siaResolvers = {
         if (acudiente !== undefined) estudianteData.acudiente = acudiente;
         if (curso !== undefined) estudianteData.curso = curso;
         
-        return await siaService.updateEstudianteParcial(id, estudianteData);
+        const estudiante = await siaService.updateEstudianteParcial(id, estudianteData);
+        return {
+          success: true,
+          message: "Estudiante actualizado exitosamente",
+          estudiante: estudiante,
+          errors: []
+        };
       } catch (error) {
-        throw new Error(`Error al actualizar estudiante parcialmente: ${error.message}`);
+        return {
+          success: false,
+          message: `Error al actualizar estudiante parcialmente: ${error.message}`,
+          estudiante: null,
+          errors: [error.message]
+        };
       }
     },
 
@@ -207,9 +283,19 @@ const siaResolvers = {
     eliminarEstudiante: async (_, { id }) => {
       try {
         const result = await siaService.deleteEstudiante(id);
-        return result.success || true;
+        return {
+          success: true,
+          message: "Estudiante eliminado exitosamente",
+          estudiante: null,
+          errors: []
+        };
       } catch (error) {
-        throw new Error(`Error al eliminar estudiante: ${error.message}`);
+        return {
+          success: false,
+          message: `Error al eliminar estudiante: ${error.message}`,
+          estudiante: null,
+          errors: [error.message]
+        };
       }
     }
   },
@@ -217,12 +303,18 @@ const siaResolvers = {
   // =============== RESOLVERS DE RELACIONES ===============
 
   /**
-   * Resolver para obtener estudiantes de un curso
+   * Resolver para obtener estudiantes de un curso (optimizado)
    */
   Curso: {
     estudiantes: async (parent) => {
       try {
-        return await siaService.getCursoEstudiantes(parent.id);
+        // Si el curso ya tiene estudiantes cargados (con CursoDetailSerializer)
+        if (parent.estudiantes && Array.isArray(parent.estudiantes)) {
+          return parent.estudiantes;
+        }
+        
+        // Fallback: usar DataLoader si no están cargados
+        return await siaService.cursoEstudiantesLoader.load(parent.id);
       } catch (error) {
         // Si hay error, retornar array vacío en lugar de fallar
         console.warn(`Error al obtener estudiantes del curso ${parent.id}: ${error.message}`);
@@ -232,19 +324,24 @@ const siaResolvers = {
   },
 
   /**
-   * Resolver para obtener el curso de un estudiante
+   * Resolver para obtener el curso de un estudiante (optimizado con DataLoader)
    */
   Estudiante: {
     curso: async (parent) => {
       try {
-        // Si el estudiante ya tiene el curso cargado (por ejemplo en la respuesta detallada)
-        if (parent.curso && typeof parent.curso === 'object') {
+        // Si no hay curso asignado, retornar null
+        if (!parent.curso) {
+          return null;
+        }
+        
+        // Con select_related, el curso ya viene como objeto completo desde Django
+        if (parent.curso && typeof parent.curso === 'object' && parent.curso.id) {
           return parent.curso;
         }
         
-        // Si solo tenemos el ID del curso, necesitamos obtenerlo
-        if (parent.curso) {
-          return await siaService.getCurso(parent.curso);
+        // Fallback: si solo tenemos el ID del curso, usar DataLoader
+        if (parent.curso && typeof parent.curso === 'number') {
+          return await siaService.cursoLoader.load(parent.curso);
         }
         
         return null;

@@ -1,4 +1,4 @@
-const authResolver = require('./authResolver');
+const authResolver = require('./authResolvers');
 const siaResolvers = require('./siaResolvers');
 
 const restResolvers = {

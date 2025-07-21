@@ -1,5 +1,38 @@
 const fetch = require("node-fetch");
+const DataLoader = require("dataloader");
 const { GX_SIA_URL } = require("../configs/config");
+
+// =============== DATALOADERS ===============
+
+/**
+ * DataLoader para cargar múltiples cursos por IDs de forma eficiente
+ */
+const cursoLoader = new DataLoader(async (ids) => {
+  try {
+    // Hacer una sola consulta para obtener todos los cursos
+    const promises = ids.map(id => getCurso(id));
+    return await Promise.all(promises);
+  } catch (error) {
+    // Si falla, retornar null para cada ID
+    return ids.map(() => null);
+  }
+});
+
+/**
+ * DataLoader para cargar estudiantes de múltiples cursos de forma eficiente
+ */
+const cursoEstudiantesLoader = new DataLoader(async (cursoIds) => {
+  try {
+    // Hacer consultas paralelas para obtener estudiantes de cada curso
+    const promises = cursoIds.map(id => getCursoEstudiantes(id));
+    return await Promise.all(promises);
+  } catch (error) {
+    // Si falla, retornar array vacío para cada curso
+    return cursoIds.map(() => []);
+  }
+});
+
+// =============== FUNCIONES AUXILIARES ===============
 
 /**
  * Helper para invocar endpoints REST del microservicio SIA Colegios (Component-1)
@@ -164,6 +197,10 @@ async function getEstudiantesPorCurso(codigo) {
 module.exports = {
   // Servicios generales
   invokeSIAEndpoint,
+  
+  // DataLoaders optimizados
+  cursoLoader,
+  cursoEstudiantesLoader,
   
   // Servicios de cursos
   getCursos,

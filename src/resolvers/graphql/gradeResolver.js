@@ -14,19 +14,45 @@ const gradeResolver = {
   Mutation: {
     registrarCalificacion: async (
       _,
-      { estudianteId, asignaturaId, cursoId, periodo, nota, observaciones }
-    ) =>
-      registrarCalificacion({
-        estudianteId,
-        asignaturaId,
-        cursoId,
-        periodo,
-        nota,
-        observaciones
-      }),
+      { input }
+    ) => {
+      try {
+        const calificacion = await registrarCalificacion(input);
+        return {
+          success: true,
+          message: "Calificación registrada correctamente",
+          calificacion,
+          errors: []
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: "Error al registrar calificación",
+          calificacion: null,
+          errors: [error.message || "Error desconocido"]
+        };
+      }
+    },
     actualizarCalificacion: async (_, { id, nota, observaciones }) =>
       actualizarCalificacion({ id, nota, observaciones }),
-    eliminarCalificacion: async (_, { id }) => eliminarCalificacion({ id })
+    eliminarCalificacion: async (_, { id }) => {
+      try {
+        const result = await eliminarCalificacion({ id });
+        return {
+          success: result.success,
+          message: result.message || "Calificación eliminada correctamente",
+          calificacion: null,
+          errors: result.errors || []
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: "Error al eliminar calificación",
+          calificacion: null,
+          errors: [error.message || "Error desconocido"]
+        };
+      }
+    }
   }
 };
 

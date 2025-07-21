@@ -15,8 +15,7 @@ const subjectResolver = {
   },
   Mutation: {
     crearAsignatura: async (_, { nombre }) => crearAsignatura({ nombre }),
-    actualizarAsignatura: async (_, { id, nombre }) => 
-      actualizarAsignatura({ id, nombre }),
+    actualizarAsignatura: async (_, { id, nombre }) => actualizarAsignatura({ id, nombre }),
     eliminarAsignatura: async (_, { id }) => eliminarAsignatura({ id }),
     asignarProfesorAAsignatura: async (_, { profesorId, asignaturaId }) =>
       asignarProfesorAAsignatura({ profesorId, asignaturaId }),

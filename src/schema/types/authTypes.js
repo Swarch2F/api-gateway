@@ -76,6 +76,7 @@ const authTypes = gql`
 
   # Extender Mutation existente
   extend type Mutation {
+    emailExists(email: String!): Boolean!
     # Registro de usuario nativo
     registerUser(input: RegisterInput!): RegisterResponse!
     

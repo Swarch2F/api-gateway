@@ -40,6 +40,15 @@ const authResolvers = {
       }
     },
 
+    // Verificar si un email existe
+    emailExists: async (_, { email }) => {
+      try {
+        return await authService.emailExists(email);
+      } catch (error) {
+        throw new AuthenticationError(error.message);
+      }
+    },
+
     // Login de usuario
     loginUser: async (_, { input }) => {
       try {

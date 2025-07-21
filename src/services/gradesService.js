@@ -3,8 +3,8 @@ const { invokeBECALIF } = require('./baseService');
 // —————— OPERACIÓN "holaMundo" ——————
 
 /**
- * Invokes BECALIF to fetch a simple greeting message.
- * @returns {Promise<string>} The "holaMundo" string from the service.
+ * Invoca BECALIF para obtener un mensaje de saludo simple.
+ * @returns {Promise<string>} El string "holaMundo" del servicio.
  */
 async function getHolaMundoFromBECALIF() {
   const query = `query { holaMundo }`;
@@ -15,21 +15,21 @@ async function getHolaMundoFromBECALIF() {
 // —————— QUERIES de Calificaciones ——————
 
 /**
- * Invokes BECALIF to fetch calificaciones with optional filters.
- * @param {Object} filters - Optional filters for the query.
- * @param {string=} filters.estudianteId - Filter by student ID (optional).
- * @param {string=} filters.asignaturaId - Filter by subject ID (optional).
- * @param {string=} filters.cursoId - Filter by course ID (optional).
- * @param {string=} filters.periodo - Filter by period (optional).
- * @returns {Promise<Array>} An array of calificacion objects.
+ * Invoca BECALIF para obtener calificaciones con filtros opcionales.
+ * @param {Object} filters - Filtros opcionales para la consulta.
+ * @param {string=} filters.estudianteId - Filtrar por ID de estudiante (opcional).
+ * @param {string=} filters.asignaturaId - Filtrar por ID de asignatura (opcional).
+ * @param {string=} filters.cursoId - Filtrar por ID de curso (opcional).
+ * @param {string=} filters.periodo - Filtrar por periodo (opcional).
+ * @returns {Promise<Array>} Un array de objetos calificación.
  */
 async function getCalificaciones(filters = {}) {
   const { estudianteId, asignaturaId, cursoId, periodo } = filters;
-  
+
   // Construir la query con parámetros opcionales
   const variables = {};
   const params = [];
-  
+
   if (estudianteId) {
     variables.estudianteId = estudianteId;
     params.push('estudianteId: $estudianteId');
@@ -48,7 +48,7 @@ async function getCalificaciones(filters = {}) {
   }
 
   const parametros = params.length > 0 ? `(${params.join(', ')})` : '';
-  
+
   const query = `
     query ${Object.keys(variables).length > 0 ? `(${Object.keys(variables).map(key => `$${key}: ${key.includes('Id') ? 'ID' : 'String'}`).join(', ')})` : ''} {
       calificaciones${parametros} {
@@ -62,7 +62,7 @@ async function getCalificaciones(filters = {}) {
       }
     }
   `;
-  
+
   const data = await invokeBECALIF(query, variables);
   return data.calificaciones;
 }
@@ -70,15 +70,15 @@ async function getCalificaciones(filters = {}) {
 // —————— MUTATIONS de Calificaciones ——————
 
 /**
- * Invokes BECALIF to register a new calificacion.
- * @param {Object} input - The input data for creating a calificacion.
- * @param {string} input.estudianteId - The student ID.
- * @param {string} input.asignaturaId - The subject ID.
- * @param {string} input.cursoId - The course ID.
- * @param {string} input.periodo - The academic period.
- * @param {number} input.nota - The grade score.
- * @param {string=} input.observaciones - Optional observations.
- * @returns {Promise<Object>} The created calificacion object.
+ * Invoca BECALIF para registrar una nueva calificación.
+ * @param {Object} input - Los datos de entrada para crear una calificación.
+ * @param {string} input.estudianteId - El ID del estudiante.
+ * @param {string} input.asignaturaId - El ID de la asignatura.
+ * @param {string} input.cursoId - El ID del curso.
+ * @param {string} input.periodo - El periodo académico.
+ * @param {number} input.nota - La nota.
+ * @param {string=} input.observaciones - Observaciones opcionales.
+ * @returns {Promise<Object>} El objeto calificación creado.
  */
 async function registrarCalificacion({
   estudianteId,
@@ -115,7 +115,7 @@ async function registrarCalificacion({
       }
     }
   `;
-  
+
   const variables = {
     estudianteId,
     asignaturaId,
@@ -124,18 +124,18 @@ async function registrarCalificacion({
     nota,
     observaciones
   };
-  
+
   const data = await invokeBECALIF(mutation, variables);
   return data.registrarCalificacion;
 }
 
 /**
- * Invokes BECALIF to update an existing calificacion.
- * @param {Object} input - The input data for updating a calificacion.
- * @param {string} input.id - The ID of the calificacion to update.
- * @param {number=} input.nota - The new grade score (optional).
- * @param {string=} input.observaciones - The new observations (optional).
- * @returns {Promise<Object>} The updated calificacion object.
+ * Invoca BECALIF para actualizar una calificación existente.
+ * @param {Object} input - Los datos de entrada para actualizar una calificación.
+ * @param {string} input.id - El ID de la calificación a actualizar.
+ * @param {number=} input.nota - La nueva nota (opcional).
+ * @param {string=} input.observaciones - Las nuevas observaciones (opcional).
+ * @returns {Promise<Object>} El objeto calificación actualizado.
  */
 async function actualizarCalificacion({ id, nota, observaciones }) {
   const mutation = `
@@ -155,26 +155,31 @@ async function actualizarCalificacion({ id, nota, observaciones }) {
       }
     }
   `;
-  
+
   const variables = { id, nota, observaciones };
   const data = await invokeBECALIF(mutation, variables);
   return data.actualizarCalificacion;
 }
 
 /**
- * Invokes BECALIF to delete a calificacion by its ID.
- * @param {Object} input - The input data for deleting a calificacion.
- * @param {string} input.id - The ID of the calificacion to delete.
- * @returns {Promise<boolean>} True if the deletion was successful, otherwise false.
+ * Invoca BECALIF para eliminar una calificación por su ID.
+ * @param {Object} input - Los datos de entrada para eliminar una calificación.
+ * @param {string} input.id - El ID de la calificación a eliminar.
+ * @returns {Promise<Object>} Un objeto con success, message y errors.
  */
 async function eliminarCalificacion({ id }) {
   const mutation = `
-    mutation ($id: ID!) {
+    mutation($id: ID!) {
       eliminarCalificacion(id: $id)
     }
   `;
   const data = await invokeBECALIF(mutation, { id });
-  return data.eliminarCalificacion;
+  // Adaptar el booleano a un objeto CalificacionResponse
+  return {
+    success: !!data.eliminarCalificacion,
+    message: data.eliminarCalificacion ? "Calificación eliminada correctamente" : "No se pudo eliminar la calificación",
+    errors: data.eliminarCalificacion ? [] : ["No se pudo eliminar la calificación"]
+  };
 }
 
 module.exports = {
@@ -184,4 +189,3 @@ module.exports = {
   actualizarCalificacion,
   eliminarCalificacion
 };
-

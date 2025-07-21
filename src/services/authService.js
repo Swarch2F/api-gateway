@@ -138,6 +138,17 @@ async function handleGoogleCallback(code) {
   }
 }
 
+/**
+ * Verifica si un correo ya existe en el microservicio de autenticación
+ * @param {string} email
+ * @returns {Promise<boolean>}
+ */
+async function emailExists(email) {
+  const response = await invokeAuthService(`/users/exists?email=${encodeURIComponent(email)}`, 'GET');
+  if (!response || !response.data) return false;
+  return !!response.data.exists;
+}
+
 module.exports = {
   registerUser,
   loginUser,
@@ -145,5 +156,6 @@ module.exports = {
   linkGoogleAccount,
   getAuthStatus,
   logout,
-  handleGoogleCallback
+  handleGoogleCallback,
+  emailExists
 };
