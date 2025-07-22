@@ -33,8 +33,31 @@ const gradeResolver = {
         };
       }
     },
-    actualizarCalificacion: async (_, { id, nota, observaciones }) =>
-      actualizarCalificacion({ id, nota, observaciones }),
+    
+     /**
+     * --- CORRECCIÓN ---
+     * El resolver ahora envuelve la respuesta del servicio en el objeto 'CalificacionResponse'
+     * que define el schema. Esto asegura que la estructura de la respuesta sea consistente
+     * con las otras mutaciones y con lo que el frontend espera.
+     */
+     actualizarCalificacion: async (_, { id, nota, observaciones }) => {
+      try {
+        const calificacionActualizada = await actualizarCalificacion({ id, nota, observaciones });
+        return {
+          success: true,
+          message: "Calificación actualizada correctamente",
+          calificacion: calificacionActualizada,
+          errors: []
+        };
+      } catch (error) {
+        return {
+          success: false,
+          message: "Error al actualizar calificación",
+          calificacion: null,
+          errors: [error.message || "Error desconocido"]
+        };
+      }
+    },
     eliminarCalificacion: async (_, { id }) => {
       try {
         const result = await eliminarCalificacion({ id });
